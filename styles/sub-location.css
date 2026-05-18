@@ -1,0 +1,121 @@
+/* ============================================
+   Sub-location detail page (template for all sub-locations)
+   ============================================
+   Pattern: Bootstrap classes do as much as possible;
+   this file holds only what Bootstrap utilities can't:
+   - CSS-variable overrides for cream theme
+   - Pseudo-elements, @keyframes, @media queries
+   - :hover / transition effects
+   - Custom CSS Grid (Bootstrap d-grid has no template)
+   ============================================ */
+
+:root {
+  /* Override Bootstrap variables — Bootstrap utilities now use brand palette */
+  --bs-danger: #cc0000;
+  --bs-danger-rgb: 204, 0, 0;
+  --bs-danger-bg-subtle: #ffe5e5;
+  --bs-dark: #1a1a1a;
+  --bs-dark-rgb: 26, 26, 26;
+  --bs-border-color: #e5dfd4;
+  --bs-border-radius-xl: 1.25rem; /* rounded-4 → 20px (was 16px) */
+
+  /* Brand-specific shades Bootstrap has no equivalent for */
+  --sl-cream: #faf7f2;
+  --sl-cream-deep: #f0ebe3;
+  --sl-red-dark: #a00000;
+}
+
+/* Custom cream backgrounds — Bootstrap has no equivalent */
+.sl-bg-cream { background: var(--sl-cream); }
+.sl-bg-cream-deep { background: var(--sl-cream-deep); }
+
+/* Tune Bootstrap .card so it matches the cream theme out of the box */
+.card {
+  --bs-card-border-color: var(--bs-border-color);
+  --bs-card-border-radius: var(--bs-border-radius-xl);
+  --bs-card-spacer-y: 1.5rem;
+  --bs-card-spacer-x: 1.5rem;
+}
+
+/* Open-now banner overlay pattern */
+.sl-banner-open::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.06) 0 12px,
+    transparent 12px 24px
+  );
+  pointer-events: none;
+}
+
+/* Pulse animation */
+@keyframes sl-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+  70% { box-shadow: 0 0 0 12px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+.sl-pulse-dot { animation: sl-pulse 1.6s infinite; }
+
+/* Responsive borders on meta cells — needs descendant + @media */
+@media (min-width: 768px) {
+  .sl-meta-card .sl-meta-cell { border-right: 1px solid var(--bs-border-color); }
+  .sl-meta-card .sl-meta-cell:last-child { border-right: none; }
+}
+@media (max-width: 767px) {
+  .sl-meta-card .sl-meta-cell { border-bottom: 1px solid var(--bs-border-color); }
+  .sl-meta-card .sl-meta-cell:last-child { border-bottom: none; }
+}
+
+/* Buttons — hover + transitions */
+.sl-btn { transition: transform .15s, box-shadow .2s, background .2s, border-color .15s; }
+.sl-btn:hover { transform: translateY(-1px); box-shadow: var(--bs-box-shadow); }
+.sl-btn-red:hover { background: var(--sl-red-dark); }
+.sl-btn-dark:hover { background: #000; }
+
+/* Tiles */
+.sl-tile { transition: transform .15s, box-shadow .2s, border-color .2s; }
+.sl-tile:hover { transform: translateY(-2px); border-color: var(--bs-danger); box-shadow: var(--bs-box-shadow-lg); }
+.sl-tile-icon { transition: background .15s, color .15s; }
+.sl-tile:hover .sl-tile-icon { background: var(--bs-danger); color: #fff; }
+
+/* Reviews */
+.sl-review { transition: transform .15s, box-shadow .2s, border-color .2s; }
+.sl-review:hover { transform: translateY(-2px); box-shadow: var(--bs-box-shadow); }
+
+/* Timeline steps */
+.sl-step { transition: transform .15s, box-shadow .2s, border-color .2s; }
+.sl-step:hover { transform: translateY(-2px); box-shadow: var(--bs-box-shadow); }
+
+/* FAQ accordion */
+.sl-faq-btn { transition: background .15s; }
+.sl-faq-btn:hover { background: rgba(204, 0, 0, 0.04); }
+.sl-faq-chevron { transition: transform .25s ease; }
+.sl-faq-chevron.sl-rotated { transform: rotate(180deg); }
+
+/* Service pills (commented section) */
+.sl-svc-pill { transition: background .15s, border-color .15s, color .15s; cursor: pointer; }
+.sl-svc-pill:hover { background: #fff; border-color: var(--bs-danger); color: var(--bs-danger); }
+
+/* Inside-our-ER gallery — Bootstrap d-grid doesn't expose grid-template */
+.sl-gallery {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 240px 240px;
+  gap: 12px;
+}
+.sl-gallery > .sl-gallery-cell { transition: box-shadow .2s; }
+.sl-gallery > .sl-gallery-cell:nth-child(1) { grid-row: 1 / span 2; }
+.sl-gallery > .sl-gallery-cell:hover { box-shadow: var(--bs-box-shadow); }
+.sl-gallery > .sl-gallery-cell img { transition: transform .5s ease; }
+.sl-gallery > .sl-gallery-cell:hover img { transform: scale(1.06); }
+@media (max-width: 768px) {
+  .sl-gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 280px 180px 180px; }
+  .sl-gallery > .sl-gallery-cell:nth-child(1) { grid-row: 1; grid-column: 1 / span 2; }
+}
+
+/* Hero CTA row wrap on small screens */
+@media (max-width: 575px) {
+  .sl-hero-cta-row { flex-wrap: wrap !important; }
+}

@@ -1,0 +1,10 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Block auth-only physician portal
+Disallow: /doctors
+# Block Next.js API & internal assets
+Disallow: /api/
+
+Sitemap: https://ercare24.com/sitemap.xml
