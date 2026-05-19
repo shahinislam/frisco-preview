@@ -36,12 +36,30 @@ const LocationMap = dynamic(
   () => import("../components/templates/LocationMap"),
   {
     ssr: false,
-    loading: () => <div style={{ height: "500px", borderRadius: "16px", background: "var(--sl-cream-deep)" }} />,
+    loading: () => (
+      <div
+        style={{
+          height: "500px",
+          borderRadius: "16px",
+          background: "var(--sl-cream-deep)",
+        }}
+      />
+    ),
+  },
+);
+
+const SocialIcon = dynamic(
+  () => import("react-social-icons").then((mod) => mod.SocialIcon),
+  {
+    ssr: false,
+    loading: () => (
+      <span style={{ width: 40, height: 40, display: "inline-block" }} />
+    ),
   },
 );
 
 const DUMMY_PARENT = {
-  tel: "(972) 542-0700",
+  tel: "469-956-4326",
   street: "16300 State Hwy 121",
   city: "Frisco",
   state: "TX",
@@ -56,20 +74,17 @@ const DUMMY_PARENT = {
     {
       author: "Sarah M.",
       rating: 5,
-      body:
-        "Was seen by a doctor within 5 minutes of walking in. The staff was professional, kind, and the facility was spotless.",
+      body: "Was seen by a doctor within 5 minutes of walking in. The staff was professional, kind, and the facility was spotless.",
     },
     {
       author: "James T.",
       rating: 5,
-      body:
-        "Brought my son in late at night with a high fever. Pediatric care was excellent. Doctor explained everything clearly.",
+      body: "Brought my son in late at night with a high fever. Pediatric care was excellent. Doctor explained everything clearly.",
     },
     {
       author: "Maria L.",
       rating: 5,
-      body:
-        "Severe abdominal pain — they got me in for a CT scan immediately, diagnosed appendicitis fast, and arranged transfer for surgery.",
+      body: "Severe abdominal pain — they got me in for a CT scan immediately, diagnosed appendicitis fast, and arranged transfer for surgery.",
     },
   ],
   faqs: [
@@ -81,7 +96,7 @@ const DUMMY_PARENT = {
     {
       question: "Do I need an appointment?",
       answer:
-        "No. Walk-ins are welcome at any time. Online check-in is optional and does not delay emergency care.",
+        "No. Walk-ins are always welcome at any time. If you prefer, you can book an online appointment in advance to reserve your spot. Check-in is completed at our kiosk inside the ER once you arrive — we do not offer at-home check-in.",
     },
     {
       question: "Are you an urgent care?",
@@ -91,33 +106,39 @@ const DUMMY_PARENT = {
     {
       question: "Do you treat children?",
       answer:
-        "Yes. We treat both adult and pediatric emergencies, including high fever, dehydration, asthma, injuries, and severe abdominal pain.",
+        "Yes. We treat all adults and children, including pediatric emergencies, such as high fever, dehydration, asthma, injuries, and severe abdominal pain, and more.",
     },
     {
       question: "Do you have CT, X-ray, and lab testing?",
       answer:
-        "Yes. CT, X-ray, ultrasound, and lab services are available onsite when ordered by the ER physician.",
+        "Yes, we offer CT scan, X-ray, and laboratory services onsite 24/7.",
     },
     {
       question: "Can I call before coming in?",
       answer:
-        "Yes. You can call us anytime with questions about your symptoms, insurance, or what to expect.",
+        "Yes, you can call our Frisco emergency center anytime, 24/7, with any questions you may have.",
     },
     {
       question: "When should I call 911?",
-      answer:
-        "Call 911 for life-threatening symptoms — severe chest pain, stroke symptoms, severe breathing difficulty, major trauma, or any emergency requiring immediate ambulance care.",
+      answer: "Call 911 for all life-threatening medical emergencies.",
     },
   ],
 };
 
 const DECISION_TILES = [
-  { icon: FaUserMd, label: "Doctor in 10 minutes or less" },
-  { icon: FaXRay, label: "CT, X-ray & lab onsite" },
-  { icon: FaChild, label: "Adults & children treated" },
-  { icon: FaBed, label: "Private treatment rooms" },
-  { icon: FaClock, label: "Open 24/7/365" },
-  { icon: FaShieldAlt, label: "Call with insurance questions" },
+  { icon: FaShieldAlt, label: "Accredited for Quality and excellence" },
+  { icon: FaUserMd, label: "See board-certified doctor in 10 minutes or less" },
+  { icon: FaXRay, label: "CT, X-ray, and COLA-approved Laboratory onsite" },
+  { icon: FaBed, label: "Private Treatment Rooms with free blankets" },
+  {
+    icon: FaChild,
+    label: "Adults and Children, including pediatrics, treated",
+  },
+  { icon: FaClock, label: "Open 24 hours, 7 days, 365 days a year" },
+  {
+    icon: FaPhoneAlt,
+    label: "Streamlined Billing. Call with insurance questions",
+  },
 ];
 
 const ER_CONDITIONS = [
@@ -146,27 +167,23 @@ const URGENT_CARE_CONDITIONS = [
 const TIMELINE_STEPS = [
   {
     title: "Walk in",
-    body:
-      "A nurse greets you within a minute. No forms to fill out before you're seen.",
+    body: "A nurse greets you within minutes of your arrival.",
     time: "0–2 min",
     active: true,
   },
   {
     title: "Quick triage",
-    body:
-      "Vitals, history, and your concern — all in a private room, never a crowded hallway.",
+    body: "Your vitals taken and concerns addressed.",
     time: "2–8 min",
   },
   {
     title: "See a doctor",
-    body:
-      "Board-certified ER physician at your bedside. CT, X-ray, or labs start immediately if needed.",
+    body: "Board-certified ER physician at your bedside. CT, X-ray, or labs start immediately if needed.",
     time: "Under 10 min",
   },
   {
     title: "Treat & discharge",
-    body:
-      "Clear plan, prescriptions sent to your pharmacy, and a follow-up call the next day.",
+    body: "Clear plan, prescriptions sent to your pharmacy, and a follow-up call the next day.",
     time: "Most visits < 90 min",
   },
 ];
@@ -249,11 +266,7 @@ function FaqAccordion({ faqs }) {
               />
             </button>
             {isOpen && (
-              <div
-                className="px-4 pb-4 text-body lh-lg fs-6"
-              >
-                {faq.answer}
-              </div>
+              <div className="px-4 pb-4 text-body lh-lg fs-6">{faq.answer}</div>
             )}
           </div>
         );
@@ -264,7 +277,11 @@ function FaqAccordion({ faqs }) {
 
 export default function FriscoDummy2({ location }) {
   const [, setCurrentUrl] = useState("");
-  const parent = { ...DUMMY_PARENT, ...(location.location || {}) };
+  const parent = {
+    ...DUMMY_PARENT,
+    ...location,
+    ...(location.parent || {}),
+  };
 
   useEffect(() => {
     setCurrentUrl(window.location.href);
@@ -297,11 +314,12 @@ export default function FriscoDummy2({ location }) {
           addressCountry: "US",
         },
         geo:
-          location.latitude && location.longitude
+          (parent.latitude || location.latitude) &&
+          (parent.longitude || location.longitude)
             ? {
                 "@type": "GeoCoordinates",
-                latitude: location.latitude,
-                longitude: location.longitude,
+                latitude: parent.latitude || location.latitude,
+                longitude: parent.longitude || location.longitude,
               }
             : undefined,
         url: mainURL + "/frisco-dummy-2",
@@ -368,21 +386,32 @@ export default function FriscoDummy2({ location }) {
       <div className="sl-bg-cream text-dark" style={{ paddingBottom: "90px" }}>
         {/* ============ OPEN-NOW BANNER ============ */}
         <div className="sl-banner-open bg-danger text-white position-relative overflow-hidden">
-          <div
-            className="container position-relative d-flex flex-wrap align-items-center justify-content-center gap-3 py-2 text-center small"
-          >
+          <div className="container position-relative d-flex flex-wrap align-items-center justify-content-center gap-3 py-2 text-center small">
             <span
               className="sl-pulse-dot rounded-circle bg-white flex-shrink-0"
               style={{ width: "8px", height: "8px" }}
             />
-            <span className="fw-bold small">
-              Open right now
-            </span>
-            <span className="d-none d-md-inline-block" style={{ width: "1px", height: "12px", background: "rgba(255,255,255,.4)" }} />
+            <span className="fw-bold small">Open right now</span>
+            <span
+              className="d-none d-md-inline-block"
+              style={{
+                width: "1px",
+                height: "12px",
+                background: "rgba(255,255,255,.4)",
+              }}
+            />
             <span className="d-none d-md-inline fw-medium opacity-75">
-              Walk in anytime · No appointment · Doctor in 10 min or less
+              Walk in anytime · No appointment · See a doctor in 10 minutes or
+              less
             </span>
-            <span className="d-none d-md-inline-block" style={{ width: "1px", height: "12px", background: "rgba(255,255,255,.4)" }} />
+            <span
+              className="d-none d-md-inline-block"
+              style={{
+                width: "1px",
+                height: "12px",
+                background: "rgba(255,255,255,.4)",
+              }}
+            />
             <a
               href={"tel:" + parent.tel}
               onClick={() => trackPhoneCall(parent.tel, parent.city)}
@@ -394,25 +423,25 @@ export default function FriscoDummy2({ location }) {
         </div>
 
         {/* ============ HERO ============ */}
-        <section className="sl-bg-cream py-5">
+        <section className="bg-white py-5">
           <div className="container">
             <div className="row align-items-center g-5">
               <div className="col-lg-6">
-                <div
-                  className="d-inline-flex align-items-center gap-2 bg-white border rounded-pill fw-semibold text-body mb-3 py-1 px-3 small"
-                >
+                <div className="d-inline-flex align-items-center gap-2 bg-white border rounded-pill fw-semibold text-body mb-3 py-1 px-3 small">
                   <span
                     className="rounded-circle bg-danger"
-                    style={{ width: "7px", height: "7px", boxShadow: "0 0 0 3px rgba(204,0,0,.13)" }}
+                    style={{
+                      width: "7px",
+                      height: "7px",
+                      boxShadow: "0 0 0 3px rgba(204,0,0,.13)",
+                    }}
                   />
                   Open now · 24/7/365
                 </div>
 
-                <h1
-                  className="fw-bold text-dark mb-3"
-                  style={{ lineHeight: 1.05, letterSpacing: "-0.025em" }}
-                >
-                  24-Hour Emergency Room<br />
+                <h1 className="fw-bold text-dark mb-3">
+                  24-Hour Emergency Room
+                  <br />
                   in {parent.city}, {parent.state}
                 </h1>
 
@@ -428,56 +457,55 @@ export default function FriscoDummy2({ location }) {
                 {/* meta card */}
                 <div className="sl-meta-card card shadow-sm overflow-hidden mb-4">
                   <div className="row g-0">
-                  <div className="sl-meta-cell col-12 col-md-5 p-3">
-                    <div
-                      className="fw-bold text-uppercase text-muted mb-1 small"
-                      style={{ letterSpacing: "0.1em" }}
-                    >
-                      Address
-                    </div>
-                    <div
-                      className="text-dark d-flex align-items-start gap-2 fw-bold lh-sm small"
-                    >
-                      <FaMapMarkerAlt size={12} className="text-danger flex-shrink-0 mt-1" />
-                      <span>
-                        {parent.street}
-                        <span className="d-block fw-medium text-muted mt-1 small">
-                          {parent.city}, {parent.state} {parent.zip}
+                    <div className="sl-meta-cell col-12 col-md-5 p-3">
+                      <div
+                        className="fw-bold text-uppercase text-muted mb-1 small"
+                        style={{ letterSpacing: "0.1em" }}
+                      >
+                        Address
+                      </div>
+                      <div className="text-dark d-flex align-items-start gap-2 fw-bold lh-sm small">
+                        <FaMapMarkerAlt
+                          size={12}
+                          className="text-danger flex-shrink-0 mt-1"
+                        />
+                        <span>
+                          {parent.street}
+                          <span className="d-block fw-medium text-muted mt-1 small">
+                            {parent.city}, {parent.state} {parent.zip}
+                          </span>
                         </span>
-                      </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="sl-meta-cell col-12 col-md p-3">
-                    <div
-                      className="fw-bold text-uppercase text-muted mb-1 small"
-                      style={{ letterSpacing: "0.1em" }}
-                    >
-                      Hours
+                    <div className="sl-meta-cell col-12 col-md p-3">
+                      <div
+                        className="fw-bold text-uppercase text-muted mb-1 small"
+                        style={{ letterSpacing: "0.1em" }}
+                      >
+                        Hours
+                      </div>
+                      <div className="fw-bold text-danger lh-sm small">
+                        Open 24/7/365
+                        <span className="d-block fw-medium text-muted mt-1 small">
+                          Walk-ins welcome
+                        </span>
+                      </div>
                     </div>
-                    <div className="fw-bold text-danger lh-sm small">
-                      Open 24/7/365
+                    <div className="sl-meta-cell col-12 col-md p-3">
+                      <div
+                        className="fw-bold text-uppercase text-muted mb-1 small"
+                        style={{ letterSpacing: "0.1em" }}
+                      >
+                        Rating
+                      </div>
+                      <div className="text-dark d-flex align-items-center gap-2 fw-bold lh-sm small">
+                        <span>{parent.google_rating}</span>
+                        <Stars rating={5} size={11} />
+                      </div>
                       <span className="d-block fw-medium text-muted mt-1 small">
-                        Walk-ins welcome
+                        {parent.google_review_count.toLocaleString()}+ reviews
                       </span>
                     </div>
-                  </div>
-                  <div className="sl-meta-cell col-12 col-md p-3">
-                    <div
-                      className="fw-bold text-uppercase text-muted mb-1 small"
-                      style={{ letterSpacing: "0.1em" }}
-                    >
-                      Rating
-                    </div>
-                    <div
-                      className="text-dark d-flex align-items-center gap-2 fw-bold lh-sm small"
-                    >
-                      <span>{parent.google_rating}</span>
-                      <Stars rating={5} size={11} />
-                    </div>
-                    <span className="d-block fw-medium text-muted mt-1 small">
-                      {parent.google_review_count.toLocaleString()}+ reviews
-                    </span>
-                  </div>
                   </div>
                 </div>
 
@@ -506,7 +534,7 @@ export default function FriscoDummy2({ location }) {
                     className="sl-btn sl-btn-outline bg-white text-dark d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap border border-dark rounded-3 py-2 px-3 flex-shrink-0 lh-1 small"
                     onClick={() => trackBookAppointment("frisco-dummy-2")}
                   >
-                    Start Online Check-In <FaArrowRight size={11} />
+                    Get online Appointment <FaArrowRight size={11} />
                   </Link>
                 </div>
               </div>
@@ -519,7 +547,10 @@ export default function FriscoDummy2({ location }) {
                   >
                     <Image
                       src={laravelURL + "/storage/" + location.media.path}
-                      alt={location.media.alt_text || `${parent.city} Emergency Room`}
+                      alt={
+                        location.media.alt_text ||
+                        `${parent.city} Emergency Room`
+                      }
                       fill
                       sizes="(max-width: 992px) 100vw, 600px"
                       className="object-fit-cover"
@@ -540,19 +571,24 @@ export default function FriscoDummy2({ location }) {
         </section>
 
         {/* ============ 911 DISCLAIMER ============ */}
-        <section className="sl-bg-cream-deep text-dark">
-          <div
-            className="container d-flex flex-wrap align-items-center justify-content-center gap-3 py-2 text-center lh-base small"
-          >
+        <section className="sl-bg-cream text-dark">
+          <div className="container d-flex flex-wrap align-items-center justify-content-center gap-3 py-2 text-center lh-base small">
             <FaShieldAlt size={12} className="text-success flex-shrink-0" />
             <span className="fw-medium">
-              <strong className="text-dark">Walk-ins are always welcome.</strong>{" "}
-              Online check-in is optional. For a life-threatening emergency:
+              <strong className="text-dark">
+                Walk-ins are always welcome.
+              </strong>{" "}
+              Online appointment is optional. If this is a life-threatening
+              emergency, please
             </span>
             <a
               href="tel:911"
               className="d-inline-flex align-items-center gap-2 fw-bold rounded-pill text-decoration-none py-1 px-2 small"
-              style={{ background: "#ffd9a8", color: "#5c2e0e", letterSpacing: "0.02em" }}
+              style={{
+                background: "#ffd9a8",
+                color: "#5c2e0e",
+                letterSpacing: "0.02em",
+              }}
             >
               <FaPhoneAlt size={10} /> Call 911
             </a>
@@ -569,12 +605,14 @@ export default function FriscoDummy2({ location }) {
                   <Stars size={18} />
                   <strong className="fs-6">{parent.google_rating}</strong>
                   <span className="text-muted small">
-                    out of 5 ({parent.google_review_count.toLocaleString()}+ reviews)
+                    out of 5 ({parent.google_review_count.toLocaleString()}+
+                    reviews)
                   </span>
                 </div>
 
                 <div className="text-muted fst-italic mb-2 small">
-                  Sample reviews shown below — actual Google reviews will display here.
+                  Sample reviews shown below — actual Google reviews will
+                  display here.
                 </div>
 
                 <div className="d-flex flex-column gap-3">
@@ -584,14 +622,10 @@ export default function FriscoDummy2({ location }) {
                         <div className="mb-2">
                           <Stars rating={r.rating} size={12} />
                         </div>
-                        <p
-                          className="text-body fst-italic mb-3 lh-base small"
-                        >
+                        <p className="text-body fst-italic mb-3 lh-base small">
                           &ldquo;{r.body}&rdquo;
                         </p>
-                        <div
-                          className="fw-semibold text-dark small"
-                        >
+                        <div className="fw-semibold text-dark small">
                           — {r.author}
                         </div>
                       </div>
@@ -599,18 +633,25 @@ export default function FriscoDummy2({ location }) {
                   ))}
                 </div>
 
-                <Link
-                  href="#"
-                  className="d-inline-flex align-items-center gap-2 mt-3 text-dark fw-semibold text-decoration-underline small"
-                  style={{ textUnderlineOffset: "3px" }}
-                >
-                  See more {parent.city} reviews <FaArrowRight size={11} />
-                </Link>
+                {(parent.google_review_url || parent.google) && (
+                  <Link
+                    href={parent.google_review_url || parent.google}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="d-inline-flex align-items-center gap-2 mt-3 text-dark fw-semibold text-decoration-underline small"
+                    style={{ textUnderlineOffset: "3px" }}
+                  >
+                    See more {parent.city} reviews <FaArrowRight size={11} />
+                  </Link>
+                )}
               </div>
 
               <div className="col-lg-6">
                 <Eyebrow>Visit our {parent.city} ER</Eyebrow>
-                <h3 className="fs-4 fw-bold mb-2 text-dark" style={{ letterSpacing: "-0.01em" }}>
+                <h3
+                  className="fs-4 fw-bold mb-2 text-dark"
+                  style={{ letterSpacing: "-0.01em" }}
+                >
                   {parent.address}
                 </h3>
                 <div className="text-muted mb-3 small">
@@ -623,46 +664,24 @@ export default function FriscoDummy2({ location }) {
                     location={{
                       name: `SignatureCare ER - ${parent.city}`,
                       address: parent.address,
-                      latitude: location.latitude || "33.1085",
-                      longitude: location.longitude || "-96.8033",
+                      latitude:
+                        parent.latitude || location.latitude || "33.1085",
+                      longitude:
+                        parent.longitude || location.longitude || "-96.8033",
                     }}
                   />
                   <div
-                    className="position-absolute bg-white d-flex align-items-center gap-2 py-2 px-3 rounded-3 shadow"
-                    style={{ zIndex: 10, top: "14px", left: "14px", right: "14px" }}
-                  >
-                    <div className="flex-grow-1 min-w-0">
-                      <div
-                        className="d-inline-flex align-items-center gap-2 bg-dark text-white rounded-pill fw-bold mb-1 py-1 px-2 small"
-                        style={{ letterSpacing: "0.06em" }}
-                      >
-                        <span
-                          className="rounded-circle bg-danger"
-                          style={{ width: "6px", height: "6px", boxShadow: "0 0 0 3px rgba(204,0,0,.2)" }}
-                        />
-                        LIVE · {parent.city.toUpperCase()}
-                      </div>
-                      <div className="text-muted lh-sm small">
-                        {parent.address}
-                      </div>
-                    </div>
-                    <a
-                      href={parent.google}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={() => trackGetDirections(parent.city)}
-                      aria-label="Get directions"
-                      className="d-flex align-items-center justify-content-center sl-bg-cream rounded text-dark flex-shrink-0" style={{ width: "34px", height: "34px" }}
-                    >
-                      <FaDirections size={14} />
-                    </a>
-                  </div>
-                  <div
                     className="position-absolute bg-white d-flex align-items-center gap-3 p-3 rounded-4 shadow"
-                    style={{ zIndex: 10, bottom: "14px", left: "14px", right: "14px" }}
+                    style={{
+                      zIndex: 10,
+                      bottom: "14px",
+                      left: "14px",
+                      right: "14px",
+                    }}
                   >
                     <div
-                      className="d-flex align-items-center justify-content-center flex-shrink-0 bg-danger text-white rounded-3" style={{ width: "44px", height: "44px" }}
+                      className="d-flex align-items-center justify-content-center flex-shrink-0 bg-danger text-white rounded-3"
+                      style={{ width: "44px", height: "44px" }}
                     >
                       <FaMapMarkerAlt size={20} />
                     </div>
@@ -674,9 +693,7 @@ export default function FriscoDummy2({ location }) {
                         {parent.address}
                       </div>
                       <div className="d-flex align-items-center gap-3 mt-1 small">
-                        <span
-                          className="d-inline-flex align-items-center fw-semibold text-success gap-1"
-                        >
+                        <span className="d-inline-flex align-items-center fw-semibold text-success gap-1">
                           <span
                             className="rounded-circle bg-success"
                             style={{ width: "6px", height: "6px" }}
@@ -684,8 +701,14 @@ export default function FriscoDummy2({ location }) {
                           Open now
                         </span>
                         <span className="text-muted">
-                          <FaStar size={11} className="text-warning me-1" style={{ marginTop: "-2px" }} />
-                          <strong className="text-dark">{parent.google_rating}</strong>{" "}
+                          <FaStar
+                            size={11}
+                            className="text-warning me-1"
+                            style={{ marginTop: "-2px" }}
+                          />
+                          <strong className="text-dark">
+                            {parent.google_rating}
+                          </strong>{" "}
                           ({parent.google_review_count.toLocaleString()}+)
                         </span>
                       </div>
@@ -707,23 +730,28 @@ export default function FriscoDummy2({ location }) {
         </section>
 
         {/* ============ WHY CHOOSE / TILES ============ */}
-        <section className="sl-bg-cream-deep py-5">
+        <section className="sl-bg-cream py-5">
           <div className="container">
-            <div className="text-center mx-auto mb-5" style={{ maxWidth: "780px" }}>
+            <div
+              className="text-center mx-auto mb-5"
+              style={{ maxWidth: "780px" }}
+            >
               <SectionHeading className="mb-3">
                 Why Choose SignatureCare Emergency Center?
               </SectionHeading>
               <p className="text-body fs-6 lh-lg mb-0">
                 We are nationally accredited, open 24 hours a day, and highly
                 rated by our patients. Our physicians are experienced, and we
-                are committed to providing an experience that reduces the
-                stress of visiting an emergency room.
+                are committed to providing an experience that reduces the stress
+                of visiting an emergency room.
               </p>
             </div>
 
             <div className="row g-3">
               {DECISION_TILES.filter(
-                (t) => t.label !== "Open 24/7/365" || parent.is_24_7,
+                (t) =>
+                  t.label !== "Open 24 hours, 7 days, 365 days a year" ||
+                  parent.is_24_7,
               ).map((tile, i) => {
                 const Icon = tile.icon;
                 return (
@@ -731,13 +759,12 @@ export default function FriscoDummy2({ location }) {
                     <div className="sl-tile card h-100">
                       <div className="card-body d-flex align-items-start gap-3">
                         <div
-                          className="sl-tile-icon bg-danger-subtle text-danger d-flex align-items-center justify-content-center flex-shrink-0 rounded-3" style={{ width: "44px", height: "44px" }}
+                          className="sl-tile-icon bg-danger-subtle text-danger d-flex align-items-center justify-content-center flex-shrink-0 rounded-3"
+                          style={{ width: "44px", height: "44px" }}
                         >
                           <Icon size={20} />
                         </div>
-                        <div
-                          className="fw-semibold text-dark pt-2 lh-sm fs-6"
-                        >
+                        <div className="fw-semibold text-dark pt-2 lh-sm fs-6">
                           {tile.label}
                         </div>
                       </div>
@@ -760,8 +787,15 @@ export default function FriscoDummy2({ location }) {
                     style={{ aspectRatio: "4/3" }}
                   >
                     <Image
-                      src={laravelURL + "/storage/" + location.slider_images[0].media.path}
-                      alt={location.slider_images[0].media.alt_text || `Inside ${parent.city}`}
+                      src={
+                        laravelURL +
+                        "/storage/" +
+                        location.slider_images[0].media.path
+                      }
+                      alt={
+                        location.slider_images[0].media.alt_text ||
+                        `Inside ${parent.city}`
+                      }
                       fill
                       sizes="(max-width: 992px) 100vw, 500px"
                       className="object-fit-cover"
@@ -796,7 +830,10 @@ export default function FriscoDummy2({ location }) {
                         key={i}
                         className="col-12 col-sm-6 d-flex align-items-start gap-2 text-body lh-sm small"
                       >
-                        <FaCheckCircle size={13} className="text-danger flex-shrink-0 mt-1" />
+                        <FaCheckCircle
+                          size={13}
+                          className="text-danger flex-shrink-0 mt-1"
+                        />
                         <span>{c}</span>
                       </div>
                     ))}
@@ -813,29 +850,34 @@ export default function FriscoDummy2({ location }) {
                         key={i}
                         className="col-12 col-sm-6 d-flex align-items-start gap-2 text-body lh-sm small"
                       >
-                        <FaCheckCircle size={13} className="text-muted flex-shrink-0 mt-1" />
+                        <FaCheckCircle
+                          size={13}
+                          className="text-muted flex-shrink-0 mt-1"
+                        />
                         <span>{c}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-
-                <div className="mt-4">
-                  <a
-                    href={"tel:" + parent.tel}
-                    className="sl-btn sl-btn-dark bg-dark text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap rounded-3 py-2 px-3 lh-1 small"
-                    onClick={() => trackPhoneCall(parent.tel, parent.city)}
-                  >
-                    <FaPhoneAlt size={13} /> Still unsure? Call us
-                  </a>
-                </div>
               </div>
             </div>
+
+            <p className="text-center text-dark fw-semibold fs-4 mt-5 mb-0 lh-base">
+              Still not sure? Call us now at{" "}
+              <a
+                href={"tel:" + parent.tel}
+                onClick={() => trackPhoneCall(parent.tel, parent.city)}
+                className="text-danger fw-bold text-decoration-underline"
+              >
+                {parent.tel}
+              </a>
+              , and our team can help guide you.
+            </p>
           </div>
         </section>
 
         {/* ============ TIMELINE ============ */}
-        <section className="sl-bg-cream-deep py-5 border-top border-bottom">
+        <section className="sl-bg-cream py-5 border-top border-bottom">
           <div className="container">
             <div className="mb-4" style={{ maxWidth: "760px" }}>
               <Eyebrow>When you arrive</Eyebrow>
@@ -843,8 +885,8 @@ export default function FriscoDummy2({ location }) {
                 From walk-in to discharge — here&rsquo;s what happens.
               </SectionHeading>
               <p className="text-muted mb-0 lh-base fs-6">
-                No mystery. No long waiting room. Average door-to-discharge is
-                under 90 minutes for most visits.
+                No long wait in a crowded waiting room. Average time from walk
+                in to discharge is under 90 minutes for most patients.
               </p>
             </div>
 
@@ -914,14 +956,17 @@ export default function FriscoDummy2({ location }) {
 
         {/* ============ INSIDE GALLERY ============ */}
         {location.slider_images?.length > 0 && (
-          <section className="sl-bg-cream py-5">
+          <section className="bg-white py-5">
             <div className="container">
               <div className="mb-4">
                 <Eyebrow>Inside our {parent.city} ER</Eyebrow>
                 <ul className="list-unstyled text-muted mb-0 lh-base small d-flex flex-wrap gap-3 mt-3">
                   {GALLERY_FEATURES.map((feature, i) => (
                     <li key={i} className="d-flex align-items-center gap-2">
-                      <FaCheckCircle size={13} className="text-danger flex-shrink-0" />
+                      <FaCheckCircle
+                        size={13}
+                        className="text-danger flex-shrink-0"
+                      />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -937,7 +982,9 @@ export default function FriscoDummy2({ location }) {
                     <Image
                       fill
                       src={laravelURL + "/storage/" + item.media?.path}
-                      alt={item.media?.alt_text || `${parent.city} Emergency Room`}
+                      alt={
+                        item.media?.alt_text || `${parent.city} Emergency Room`
+                      }
                       sizes="(max-width: 768px) 100vw, (max-width: 992px) 50vw, 33vw"
                       className="object-fit-cover"
                       quality={75}
@@ -951,112 +998,51 @@ export default function FriscoDummy2({ location }) {
         )}
 
         {/* ============ INSURANCE ============ */}
-        <section className="bg-white py-5">
+        <section className="sl-bg-cream py-5">
           <div className="container">
-            <div className="row g-4 align-items-stretch">
-              <div className="col-lg-7">
-                <div className="card sl-bg-cream h-100">
-                  <div className="card-body p-5">
-                  <Eyebrow>Insurance & billing</Eyebrow>
-                  <h2
-                    className="fw-bold mb-3"
-                    style={{
-                      lineHeight: 1.15,
-                      letterSpacing: "-0.02em",
-                    }}
+            <div className="card bg-white">
+              <div className="card-body p-5">
+                <Eyebrow>Insurance &amp; billing</Eyebrow>
+                <SectionHeading className="mb-3">
+                  Insurance and Billing Questions?
+                </SectionHeading>
+                <p className="text-body mb-3 lh-lg fs-6">
+                  SignatureCare Emergency Center in {parent.city} is a licensed
+                  freestanding emergency room. ER billing is different from
+                  urgent care billing. If you have questions about insurance,
+                  benefits, or what to expect, please call our {parent.city}{" "}
+                  team, and we will help explain the process. We bill most
+                  national insurance plans, including Workers&rsquo;
+                  Compensation. Please call our facility at{" "}
+                  <a
+                    href={"tel:" + parent.tel}
+                    onClick={() => trackPhoneCall(parent.tel, parent.city)}
+                    className="text-danger fw-bold text-decoration-underline"
                   >
-                    Have questions about coverage? Call us first.
-                  </h2>
-                  <p className="text-body mb-3 lh-lg fs-6">
-                    SignatureCare Emergency Center {parent.city} is a licensed
-                    freestanding emergency room. ER billing works differently
-                    than urgent care or a clinic. If you have questions about
-                    insurance, benefits, or what to expect, our {parent.city}{" "}
-                    team will explain it before you come in.
-                  </p>
-                  <p className="text-body fs-6 lh-lg mb-3">
-                    <strong>We accept most insurance plans</strong>, including
-                    Workers&rsquo; Compensation. No commitment — just a clear
-                    answer.
-                  </p>
-                  <p
-                    className="text-muted fst-italic border-top pt-3 mb-4 lh-base small"
+                    {parent.tel}
+                  </a>{" "}
+                  for information regarding your specific insurance coverage if
+                  you still have questions. We are open 24/7.
+                </p>
+                <p className="text-body fs-6 lh-lg mb-4">
+                  If you are experiencing a serious or life-threatening
+                  emergency, call 911 or go to the nearest emergency room.
+                </p>
+                <div className="d-flex flex-wrap gap-2">
+                  <a
+                    href={"tel:" + parent.tel}
+                    className="sl-btn sl-btn-red bg-danger text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap rounded-3 py-2 px-3 lh-1 small"
+                    onClick={() => trackPhoneCall(parent.tel, parent.city)}
                   >
-                    <strong className="text-dark fst-normal">Facility notice:</strong>{" "}
-                    SignatureCare is a freestanding emergency medical care
-                    facility. Visit fees may include facility fees, observation
-                    fees, and physician fees. For life-threatening emergencies
-                    call 911 or go to the nearest ER.
-                  </p>
-                  <div className="d-flex flex-wrap gap-2">
-                    <a
-                      href={"tel:" + parent.tel}
-                      className="sl-btn sl-btn-red bg-danger text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap rounded-3 py-2 px-3 lh-1 small"
-                      onClick={() => trackPhoneCall(parent.tel, parent.city)}
-                    >
-                      <FaPhoneAlt size={13} /> Call {parent.city} about insurance
-                    </a>
-                    <Link
-                      href="/insurance-information"
-                      className="sl-btn sl-btn-outline bg-white text-dark d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap border border-dark rounded-3 py-2 px-3 lh-1 small"
-                    >
-                      Read facility notice <FaArrowRight size={11} />
-                    </Link>
-                  </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="col-lg-5">
-                <div className="card shadow h-100">
-                  <div className="card-body">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                      <div
-                        className="fw-bold text-uppercase text-muted small"
-                        style={{ letterSpacing: "0.1em" }}
-                      >
-                        {parent.city} billing line
-                      </div>
-                      <div
-                        className="fw-bold text-dark mt-1 lh-sm fs-4"
-                        style={{ letterSpacing: "-0.02em" }}
-                      >
-                        {parent.tel}
-                      </div>
-                    </div>
-                    <span
-                      className="bg-danger-subtle text-danger rounded-pill fw-bold text-nowrap py-1 px-2 small"
-                      style={{ letterSpacing: "0.04em" }}
-                    >
-                      Open now
-                    </span>
-                  </div>
-
-                  <div
-                    className="border-top pt-3 text-body lh-lg small"
+                    <FaPhoneAlt size={13} /> Call our {parent.city} ER about
+                    insurance concerns
+                  </a>
+                  <Link
+                    href="/insurance-information"
+                    className="sl-btn sl-btn-outline bg-white text-dark d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap border border-dark rounded-3 py-2 px-3 lh-1 small"
                   >
-                    Our {parent.city} team can walk you through insurance,
-                    benefits, and what to expect — before you come in. No
-                    commitment.
-                  </div>
-
-                  <div className="d-flex gap-2 mt-4">
-                    <a
-                      href={"tel:" + parent.tel}
-                      onClick={() => trackPhoneCall(parent.tel, parent.city)}
-                      className="sl-btn sl-btn-dark bg-dark text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap rounded-3 py-2 px-3 flex-fill lh-1 small"
-                    >
-                      Call now
-                    </a>
-                    <Link
-                      href="/insurance-information"
-                      className="sl-btn sl-btn-outline bg-white text-dark d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap border border-dark rounded-3 py-2 px-3 flex-fill lh-1 small"
-                    >
-                      Read notice
-                    </Link>
-                  </div>
-                  </div>
+                    Read facility notice <FaArrowRight size={11} />
+                  </Link>
                 </div>
               </div>
             </div>
@@ -1064,16 +1050,12 @@ export default function FriscoDummy2({ location }) {
         </section>
 
         {/* ============ FAQ ============ */}
-        <section className="sl-bg-cream py-5">
+        <section className="bg-white py-5">
           <div className="container">
-            <div className="row justify-content-center">
-              <div className="col-lg-9">
-                <div className="text-center mb-4">
-                  <SectionHeading>Frequently Asked Questions</SectionHeading>
-                </div>
-                <FaqAccordion faqs={parent.faqs} />
-              </div>
+            <div className="text-center mb-4">
+              <SectionHeading>Frequently Asked Questions</SectionHeading>
             </div>
+            <FaqAccordion faqs={parent.faqs} />
           </div>
         </section>
 
@@ -1114,8 +1096,8 @@ export default function FriscoDummy2({ location }) {
               className="mx-auto mb-4 lh-base fs-6"
               style={{ color: "#c8c2b5", maxWidth: "560px" }}
             >
-              No appointment needed. Board-certified ER physicians ready 24/7
-              at {parent.address}.
+              No appointment needed. Board-certified ER physicians available
+              24/7 at our {parent.city} Emergency Room.
             </p>
             <div className="d-flex flex-wrap justify-content-center gap-2">
               <a
@@ -1141,11 +1123,72 @@ export default function FriscoDummy2({ location }) {
                 onClick={() => trackBookAppointment("frisco-dummy-2")}
                 className="sl-btn sl-btn-outline bg-transparent text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap border border-white rounded-3 py-3 px-4 lh-1 small"
               >
-                <FaCheckCircle size={14} /> Start Online Check-In
+                <FaCheckCircle size={14} /> Get online Appointment
               </Link>
             </div>
           </div>
         </section>
+
+        {/* ============ SOCIAL MEDIA ============ */}
+        {(parent.facebook ||
+          parent.twitter ||
+          parent.youtube ||
+          parent.instagram ||
+          parent.linkedin ||
+          parent.tiktok) && (
+          <section className="sl-bg-cream py-4 text-center">
+            <div className="container">
+              {parent.facebook && (
+                <SocialIcon
+                  url={parent.facebook}
+                  network="facebook"
+                  style={{ height: 40, width: 40, margin: "0px 1px" }}
+                  title="Facebook"
+                />
+              )}
+              {parent.twitter && (
+                <SocialIcon
+                  url={parent.twitter}
+                  network="x"
+                  style={{ height: 40, width: 40, margin: "0px 1px" }}
+                  title="X"
+                />
+              )}
+              {parent.youtube && (
+                <SocialIcon
+                  url={parent.youtube}
+                  network="youtube"
+                  style={{ height: 40, width: 40, margin: "0px 1px" }}
+                  title="YouTube"
+                />
+              )}
+              {parent.instagram && (
+                <SocialIcon
+                  url={parent.instagram}
+                  network="instagram"
+                  style={{ height: 40, width: 40, margin: "0px 1px" }}
+                  title="Instagram"
+                />
+              )}
+              {parent.linkedin && (
+                <SocialIcon
+                  url={parent.linkedin}
+                  network="linkedin"
+                  style={{ height: 40, width: 40, margin: "0px 1px" }}
+                  title="LinkedIn"
+                />
+              )}
+              {parent.tiktok && (
+                <SocialIcon
+                  url={parent.tiktok}
+                  network="tiktok"
+                  style={{ height: 40, width: 40, margin: "0px 1px" }}
+                  title="TikTok"
+                />
+              )}
+            </div>
+          </section>
+        )}
       </div>
 
       {/* ============ STICKY MOBILE BAR ============ */}
@@ -1192,7 +1235,7 @@ export default function FriscoDummy2({ location }) {
           style={{ height: "54px" }}
         >
           <FaCheckCircle size={16} />
-          Check-in
+          Appointment
         </Link>
       </nav>
     </>
