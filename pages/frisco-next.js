@@ -611,24 +611,34 @@ export default function FriscoDummy2({ location }) {
                     {parent.reviews_subtitle}
                   </p>
                 )}
-                <div className="d-flex align-items-center gap-2 mb-4">
-                  <Stars size={18} />
-                  <strong className="fs-6">{parent.google_rating}</strong>
-                  <span className="text-muted small">
-                    out of 5 ({parent.google_review_count.toLocaleString()}+
-                    reviews)
-                  </span>
+                <div className="d-flex align-items-center gap-3 mb-4 p-3 sl-bg-cream rounded-4">
+                  <div className="display-5 fw-bold lh-1 text-dark">
+                    {parent.google_rating}
+                  </div>
+                  <div>
+                    <Stars size={16} />
+                    <div className="text-muted small mt-1">
+                      {parent.google_review_count.toLocaleString()}+ Google
+                      reviews
+                    </div>
+                  </div>
                 </div>
 
                 <div className="d-flex flex-column gap-3">
                   {parent.reviews.map((r, i) => (
-                    <div key={i} className="sl-review card sl-bg-cream">
+                    <div
+                      key={i}
+                      className="sl-review card bg-white border-0 border-start border-3 border-danger shadow-sm"
+                    >
                       <div className="card-body p-3 py-2">
                         <div className="mb-1">
                           <Stars rating={r.rating} size={11} />
                         </div>
-                        <p className="text-body fst-italic mb-2 lh-sm small">
-                          &ldquo;{r.body}&rdquo;
+                        <p className="text-body fst-italic mb-2 lh-sm small position-relative ps-3">
+                          <span className="position-absolute top-0 start-0 text-danger lh-1 fs-3 fw-bold">
+                            &ldquo;
+                          </span>
+                          {r.body}
                         </p>
                         <div className="fw-semibold text-dark small">
                           — {r.author}
@@ -643,8 +653,7 @@ export default function FriscoDummy2({ location }) {
                     href={parent.google_review_url || parent.google}
                     target="_blank"
                     rel="noreferrer"
-                    className="d-inline-flex align-items-center gap-2 mt-4 text-dark fw-semibold text-decoration-underline small"
-                    style={{ textUnderlineOffset: "3px" }}
+                    className="sl-btn sl-btn-outline bg-white text-dark d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap border border-dark rounded-3 py-2 px-3 mt-4 lh-1 small align-self-start"
                   >
                     See more {parent.city} reviews <FaArrowRight size={11} />
                   </Link>
@@ -665,7 +674,7 @@ export default function FriscoDummy2({ location }) {
                   Open 24 hours · 365 days a year
                 </div>
 
-                <div className="position-relative border rounded-4 overflow-hidden">
+                <div className="position-relative border rounded-4 overflow-hidden shadow-sm">
                   <LocationMap
                     height="500px"
                     location={{
