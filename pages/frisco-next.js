@@ -3,7 +3,6 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import parse from "html-react-parser";
 import {
   FaPhoneAlt,
   FaDirections,
@@ -17,15 +16,15 @@ import {
   FaStar,
   FaRegStar,
   FaMapMarkerAlt,
-  FaChevronDown,
   FaArrowRight,
+  FaAmbulance,
 } from "react-icons/fa";
+import Accordion from "react-bootstrap/Accordion";
 
 import http from "../components/utils/http";
 import laravelURL from "../components/utils/laravel-url";
 import mainURL from "../components/utils/main-url";
 import { getLayoutData } from "../components/utils/getLayoutData";
-import { addLazyLoadWithSkeleton } from "../components/utils/lazy-images";
 import {
   trackBookAppointment,
   trackGetDirections,
@@ -59,6 +58,7 @@ const SocialIcon = dynamic(
 );
 
 const DUMMY_PARENT = {
+  slug: "frisco",
   tel: "469-956-4326",
   street: "16300 State Hwy 121",
   city: "Frisco",
@@ -67,9 +67,47 @@ const DUMMY_PARENT = {
   address: "16300 State Hwy 121, Frisco, TX 75035",
   google: "https://maps.google.com/?q=16300+State+Hwy+121+Frisco+TX+75035",
   is_24_7: true,
+  status: 1,
   google_rating: 4.9,
   google_review_count: 482,
   nearby_cities: "Plano, Allen, McKinney, The Colony, Little Elm",
+
+  // Section copy (overridable per location via API)
+  hero_title: "24-Hour Emergency Room in Frisco, TX",
+  hero_subtitle:
+    "Walk in anytime. Board-certified ER physicians, CT, X-ray, labs, IV medications, stitches, fractures, chest pain, abdominal pain, migraine, and pediatric emergency care.",
+  reviews_title: "What our patients say",
+  reviews_subtitle: "",
+  map_title: "Visit our Frisco ER",
+  map_subtitle: "",
+  why_choose_title: "Why Choose SignatureCare Emergency Center?",
+  why_choose_subtitle:
+    "We are nationally accredited, open 24 hours a day, and highly rated by our patients. Our physicians are experienced, and we are committed to providing an experience that reduces the stress of visiting an emergency room.",
+  er_urgent_title: "Not sure whether you need an ER or urgent care?",
+  er_urgent_subtitle:
+    "Come to SignatureCare Emergency Center in Frisco for symptoms or injuries that may need advanced testing, imaging, IV medications, or immediate physician evaluation.",
+  er_urgent_image: "",
+  timeline_title: "When you arrive at our ER",
+  timeline_subtitle:
+    "From walk-in to discharge — here's what happens. No long wait in a crowded waiting room. Average time from walk in to discharge is under 90 minutes for most patients.",
+  gallery_title: "Inside our Frisco ER",
+  gallery_subtitle: "",
+  insurance_title: "Insurance and Billing Questions?",
+  insurance_subtitle: "",
+  faq_title: "Frequently Asked Questions",
+  faq_subtitle: "",
+  closing_title: "We're open. Walk in anytime.",
+  closing_subtitle:
+    "No appointment needed. Board-certified ER physicians available 24/7 at our Frisco Emergency Room.",
+
+  // Rich content blocks (HTML allowed for embedded links / emphasis)
+  banner_message:
+    "Walk in anytime · No appointment · See a doctor in 10 minutes or less",
+  disclaimer_html:
+    '<strong class="text-dark">Walk-ins are always welcome.</strong> Online appointment is optional. If this is a life-threatening emergency, please <a href="tel:911" class="text-dark fw-bold text-decoration-underline small">call 911.</a>',
+  insurance_body_html:
+    '<p class="text-body mb-3 lh-lg fs-6">SignatureCare Emergency Center in Frisco is a licensed freestanding emergency room. ER billing is different from urgent care billing. If you have questions about insurance, benefits, or what to expect, please call our Frisco team, and we will help explain the process. We bill most national insurance plans, including Workers&rsquo; Compensation. Please call our facility at <a href="tel:469-956-4326" class="text-danger fw-bold text-decoration-underline">469-956-4326</a> for information regarding your specific insurance coverage if you still have questions. We are open 24/7.</p><p class="text-body fs-6 lh-lg mb-4">If you are experiencing a serious or life-threatening emergency, call 911 or go to the nearest emergency room.</p>',
+
   reviews: [
     {
       author: "Sarah M.",
@@ -87,21 +125,22 @@ const DUMMY_PARENT = {
       body: "Severe abdominal pain — they got me in for a CT scan immediately, diagnosed appendicitis fast, and arranged transfer for surgery.",
     },
   ],
-  faqs: [
+};
+
+function getDefaultFaqs(parent) {
+  return [
     {
       question: "Are you open 24/7?",
-      answer:
-        "Yes. SignatureCare Emergency Center Frisco is open 24 hours a day, 365 days a year.",
+      answer: `Yes. SignatureCare Emergency Center ${parent.city} is open 24 hours a day, 365 days a year.`,
     },
     {
       question: "Do I need an appointment?",
       answer:
-        "No. Walk-ins are always welcome at any time. If you prefer, you can book an online appointment in advance to reserve your spot. Check-in is completed at our kiosk inside the ER once you arrive — we do not offer at-home check-in.",
+        "No. Walk-ins are always welcome. If you prefer, you can book an appointment online but it is not necessary.",
     },
     {
       question: "Are you an urgent care?",
-      answer:
-        "No. SignatureCare Emergency Center Frisco is a licensed freestanding emergency room with board-certified ER physicians, CT, X-ray, and onsite lab services.",
+      answer: `No. SignatureCare Emergency Center ${parent.city} is a licensed freestanding emergency room with board-certified ER physicians, CT, X-ray, and onsite lab services.`,
     },
     {
       question: "Do you treat children?",
@@ -115,29 +154,36 @@ const DUMMY_PARENT = {
     },
     {
       question: "Can I call before coming in?",
-      answer:
-        "Yes, you can call our Frisco emergency center anytime, 24/7, with any questions you may have.",
+      answer: `Yes, you can call our ${parent.city} emergency center at ${parent.tel} anytime, 24/7/365, with any questions you may have.`,
     },
     {
       question: "When should I call 911?",
       answer: "Call 911 for all life-threatening medical emergencies.",
     },
-  ],
-};
+  ];
+}
 
 const DECISION_TILES = [
-  { icon: FaShieldAlt, label: "Accredited for Quality and excellence" },
+  { icon: FaShieldAlt, label: "Accredited for quality and excellence" },
   { icon: FaUserMd, label: "See board-certified doctor in 10 minutes or less" },
   { icon: FaXRay, label: "CT, X-ray, and COLA-approved Laboratory onsite" },
-  { icon: FaBed, label: "Private Treatment Rooms with free blankets" },
+  { icon: FaBed, label: "Private treatment rooms with free blankets" },
   {
     icon: FaChild,
-    label: "Adults and Children, including pediatrics, treated",
+    label: "Adults and children, including pediatrics, treated",
   },
   { icon: FaClock, label: "Open 24 hours, 7 days, 365 days a year" },
   {
     icon: FaPhoneAlt,
-    label: "Streamlined Billing. Call with insurance questions",
+    label: "Streamlined billing. Call with insurance questions",
+  },
+  {
+    icon: FaStar,
+    label: "Highly rated emergency care by our beloved patients",
+  },
+  {
+    icon: FaAmbulance,
+    label: "Seamless ambulance transfer to area hospitals if necessary",
   },
 ];
 
@@ -197,29 +243,16 @@ const GALLERY_FEATURES = [
   "Welcoming lobby",
 ];
 
-const cleanHTML = (htmlString) => {
-  if (!htmlString) return "";
-  return htmlString
-    .replace(/<!--[\s\S]*?-->/g, "")
-    .replace(/<p[^>]*>\s*(&nbsp;|\s)*\s*<\/p>/gi, "")
-    .replace(/^(<br\s*\/?>)+|(<br\s*\/?>)+$/gi, "")
-    .trim();
-};
-
-function Eyebrow({ children, className = "" }) {
-  return (
-    <div
-      className={`text-uppercase fw-semibold mb-2 text-dark fs-3 ${className}`}
-      style={{ letterSpacing: "0.08em" }}
-    >
-      {children}
-    </div>
-  );
+// status: 0 = Closed, 1 = Open, 2 = Opening soon
+function getStatusInfo(status) {
+  if (status === 0) return { text: "Closed", dot: "bg-secondary" };
+  if (status === 2) return { text: "Opening soon", dot: "bg-warning" };
+  return { text: "Open now", dot: "bg-success" };
 }
 
-function SectionHeading({ children, className = "" }) {
+function SectionHeading({ children, className = "", as: Tag = "h2" }) {
   return (
-    <h2
+    <Tag
       className={`fw-bold ${className}`}
       style={{
         lineHeight: 1.15,
@@ -227,7 +260,7 @@ function SectionHeading({ children, className = "" }) {
       }}
     >
       {children}
-    </h2>
+    </Tag>
   );
 }
 
@@ -246,32 +279,15 @@ function Stars({ rating = 5, size = 13 }) {
 }
 
 function FaqAccordion({ faqs }) {
-  const [openIndex, setOpenIndex] = useState(0);
   return (
-    <div className="border rounded overflow-hidden bg-white">
-      {faqs.map((faq, i) => {
-        const isOpen = openIndex === i;
-        return (
-          <div key={i} className={i > 0 ? "border-top" : ""}>
-            <button
-              type="button"
-              onClick={() => setOpenIndex(isOpen ? -1 : i)}
-              aria-expanded={isOpen}
-              className="sl-faq-btn text-dark d-flex align-items-center justify-content-between w-100 px-4 py-3 bg-transparent border-0 text-start fw-semibold fs-6"
-            >
-              <span className="pe-3">{faq.question}</span>
-              <FaChevronDown
-                size={14}
-                className={`sl-faq-chevron text-muted flex-shrink-0 ${isOpen ? "sl-rotated" : ""}`}
-              />
-            </button>
-            {isOpen && (
-              <div className="px-4 pb-4 text-body lh-lg fs-6">{faq.answer}</div>
-            )}
-          </div>
-        );
-      })}
-    </div>
+    <Accordion defaultActiveKey="0">
+      {faqs.map((faq, i) => (
+        <Accordion.Item eventKey={String(i)} key={i}>
+          <Accordion.Header as="h3">{faq.question}</Accordion.Header>
+          <Accordion.Body>{faq.answer}</Accordion.Body>
+        </Accordion.Item>
+      ))}
+    </Accordion>
   );
 }
 
@@ -282,6 +298,8 @@ export default function FriscoDummy2({ location }) {
     ...location,
     ...(location.parent || {}),
   };
+
+  const faqs = parent.faqs || getDefaultFaqs(parent);
 
   useEffect(() => {
     setCurrentUrl(window.location.href);
@@ -299,7 +317,7 @@ export default function FriscoDummy2({ location }) {
     "@graph": [
       {
         "@type": ["MedicalBusiness", "EmergencyService"],
-        "@id": mainURL + "/frisco-dummy-2#business",
+        "@id": mainURL + "/" + parent.slug + "#business",
         name: `SignatureCare Emergency Center - ${parent.city}`,
         image: location.media
           ? laravelURL + "/storage/" + location.media.path
@@ -322,7 +340,7 @@ export default function FriscoDummy2({ location }) {
                 longitude: parent.longitude || location.longitude,
               }
             : undefined,
-        url: mainURL + "/frisco-dummy-2",
+        url: mainURL + "/" + parent.slug,
         openingHoursSpecification: parent.is_24_7
           ? {
               "@type": "OpeningHoursSpecification",
@@ -352,7 +370,7 @@ export default function FriscoDummy2({ location }) {
       },
       {
         "@type": "FAQPage",
-        mainEntity: parent.faqs.map((f) => ({
+        mainEntity: faqs.map((f) => ({
           "@type": "Question",
           name: f.question,
           acceptedAnswer: { "@type": "Answer", text: f.answer },
@@ -366,10 +384,10 @@ export default function FriscoDummy2({ location }) {
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
-        <link rel="canonical" href={mainURL + "/frisco-dummy-2"} />
+        <link rel="canonical" href={mainURL + "/" + parent.slug} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={mainURL + "/frisco-dummy-2"} />
+        <meta property="og:url" content={mainURL + "/" + parent.slug} />
         {location.media && (
           <meta
             property="og:image"
@@ -391,7 +409,9 @@ export default function FriscoDummy2({ location }) {
               className="sl-pulse-dot rounded-circle bg-white flex-shrink-0"
               style={{ width: "8px", height: "8px" }}
             />
-            <span className="fw-bold small">Open right now</span>
+            <span className="fw-bold small">
+              {getStatusInfo(parent.status).text}
+            </span>
             <span
               className="d-none d-md-inline-block"
               style={{
@@ -401,8 +421,7 @@ export default function FriscoDummy2({ location }) {
               }}
             />
             <span className="d-none d-md-inline fw-medium opacity-75">
-              Walk in anytime · No appointment · See a doctor in 10 minutes or
-              less
+              {parent.banner_message}
             </span>
             <span
               className="d-none d-md-inline-block"
@@ -429,30 +448,25 @@ export default function FriscoDummy2({ location }) {
               <div className="col-lg-6">
                 <div className="d-inline-flex align-items-center gap-2 bg-white border rounded-pill fw-semibold text-body mb-3 py-1 px-3 small">
                   <span
-                    className="rounded-circle bg-danger"
-                    style={{
-                      width: "7px",
-                      height: "7px",
-                      boxShadow: "0 0 0 3px rgba(204,0,0,.13)",
-                    }}
+                    className={`rounded-circle ${getStatusInfo(parent.status).dot}`}
+                    style={{ width: "7px", height: "7px" }}
                   />
-                  Open now · 24/7/365
+                  {getStatusInfo(parent.status).text}
+                  {parent.is_24_7 && parent.status === 1 && " · 24/7/365"}
                 </div>
 
-                <h1 className="fw-bold text-dark mb-3">
-                  24-Hour Emergency Room
-                  <br />
-                  in {parent.city}, {parent.state}
+                <h1 className="display-6 fw-bold text-dark mb-3">
+                  {parent.hero_title}
                 </h1>
 
-                <p
-                  className="text-body lh-base mb-4 fs-6"
-                  style={{ maxWidth: "560px" }}
-                >
-                  Walk in anytime. Board-certified ER physicians, CT, X-ray,
-                  labs, IV medications, stitches, fractures, chest pain,
-                  abdominal pain, migraine, and pediatric emergency care.
-                </p>
+                {parent.hero_subtitle && (
+                  <p
+                    className="text-body lh-base mb-4 fs-6"
+                    style={{ maxWidth: "560px" }}
+                  >
+                    {parent.hero_subtitle}
+                  </p>
+                )}
 
                 {/* meta card */}
                 <div className="sl-meta-card card shadow-sm overflow-hidden mb-4">
@@ -500,7 +514,10 @@ export default function FriscoDummy2({ location }) {
                       </div>
                       <div className="text-dark d-flex align-items-center gap-2 fw-bold lh-sm small">
                         <span>{parent.google_rating}</span>
-                        <Stars rating={5} size={11} />
+                        <Stars
+                          rating={Math.round(parent.google_rating)}
+                          size={11}
+                        />
                       </div>
                       <span className="d-block fw-medium text-muted mt-1 small">
                         {parent.google_review_count.toLocaleString()}+ reviews
@@ -532,7 +549,7 @@ export default function FriscoDummy2({ location }) {
                     target={location.acuity_url ? "_blank" : undefined}
                     rel={location.acuity_url ? "noreferrer" : undefined}
                     className="sl-btn sl-btn-outline bg-white text-dark d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap border border-dark rounded-3 py-2 px-3 flex-shrink-0 lh-1 small"
-                    onClick={() => trackBookAppointment("frisco-dummy-2")}
+                    onClick={() => trackBookAppointment(parent.slug)}
                   >
                     Get online Appointment <FaArrowRight size={11} />
                   </Link>
@@ -574,34 +591,27 @@ export default function FriscoDummy2({ location }) {
         <section className="sl-bg-cream text-dark">
           <div className="container d-flex flex-wrap align-items-center justify-content-center gap-3 py-2 text-center lh-base small">
             <FaShieldAlt size={12} className="text-success flex-shrink-0" />
-            <span className="fw-medium">
-              <strong className="text-dark">
-                Walk-ins are always welcome.
-              </strong>{" "}
-              Online appointment is optional. If this is a life-threatening
-              emergency, please
-            </span>
-            <a
-              href="tel:911"
-              className="d-inline-flex align-items-center gap-2 fw-bold rounded-pill text-decoration-none py-1 px-2 small"
-              style={{
-                background: "#ffd9a8",
-                color: "#5c2e0e",
-                letterSpacing: "0.02em",
-              }}
-            >
-              <FaPhoneAlt size={10} /> Call 911
-            </a>
+            <span
+              className="fw-medium"
+              dangerouslySetInnerHTML={{ __html: parent.disclaimer_html }}
+            />
           </div>
         </section>
 
         {/* ============ REVIEWS + MAP ============ */}
         <section className="bg-white py-5">
           <div className="container">
-            <div className="row g-5">
-              <div className="col-lg-6">
-                <Eyebrow>What our patients say</Eyebrow>
-                <div className="d-flex align-items-center gap-2 mb-3">
+            <div className="row g-5 align-items-stretch">
+              <div className="col-lg-6 d-flex flex-column">
+                <SectionHeading className="mb-3">
+                  {parent.reviews_title}
+                </SectionHeading>
+                {parent.reviews_subtitle && (
+                  <p className="text-body lh-base mb-3 fs-6">
+                    {parent.reviews_subtitle}
+                  </p>
+                )}
+                <div className="d-flex align-items-center gap-2 mb-4">
                   <Stars size={18} />
                   <strong className="fs-6">{parent.google_rating}</strong>
                   <span className="text-muted small">
@@ -610,19 +620,14 @@ export default function FriscoDummy2({ location }) {
                   </span>
                 </div>
 
-                <div className="text-muted fst-italic mb-2 small">
-                  Sample reviews shown below — actual Google reviews will
-                  display here.
-                </div>
-
                 <div className="d-flex flex-column gap-3">
                   {parent.reviews.map((r, i) => (
                     <div key={i} className="sl-review card sl-bg-cream">
-                      <div className="card-body">
-                        <div className="mb-2">
-                          <Stars rating={r.rating} size={12} />
+                      <div className="card-body p-3 py-2">
+                        <div className="mb-1">
+                          <Stars rating={r.rating} size={11} />
                         </div>
-                        <p className="text-body fst-italic mb-3 lh-base small">
+                        <p className="text-body fst-italic mb-2 lh-sm small">
                           &ldquo;{r.body}&rdquo;
                         </p>
                         <div className="fw-semibold text-dark small">
@@ -638,7 +643,7 @@ export default function FriscoDummy2({ location }) {
                     href={parent.google_review_url || parent.google}
                     target="_blank"
                     rel="noreferrer"
-                    className="d-inline-flex align-items-center gap-2 mt-3 text-dark fw-semibold text-decoration-underline small"
+                    className="d-inline-flex align-items-center gap-2 mt-4 text-dark fw-semibold text-decoration-underline small"
                     style={{ textUnderlineOffset: "3px" }}
                   >
                     See more {parent.city} reviews <FaArrowRight size={11} />
@@ -646,14 +651,16 @@ export default function FriscoDummy2({ location }) {
                 )}
               </div>
 
-              <div className="col-lg-6">
-                <Eyebrow>Visit our {parent.city} ER</Eyebrow>
-                <h3
-                  className="fs-4 fw-bold mb-2 text-dark"
-                  style={{ letterSpacing: "-0.01em" }}
-                >
-                  {parent.address}
-                </h3>
+              <div className="col-lg-6 d-flex flex-column">
+                <SectionHeading as="h3" className="mb-3 fs-6">
+                  {parent.map_title}
+                </SectionHeading>
+                {parent.map_subtitle && (
+                  <p className="text-body lh-base mb-3 fs-6">
+                    {parent.map_subtitle}
+                  </p>
+                )}
+                <div className="text-dark mb-1">{parent.address}</div>
                 <div className="text-muted mb-3 small">
                   Open 24 hours · 365 days a year
                 </div>
@@ -693,12 +700,12 @@ export default function FriscoDummy2({ location }) {
                         {parent.address}
                       </div>
                       <div className="d-flex align-items-center gap-3 mt-1 small">
-                        <span className="d-inline-flex align-items-center fw-semibold text-success gap-1">
+                        <span className="d-inline-flex align-items-center fw-semibold gap-1">
                           <span
-                            className="rounded-circle bg-success"
+                            className={`rounded-circle ${getStatusInfo(parent.status).dot}`}
                             style={{ width: "6px", height: "6px" }}
                           />
-                          Open now
+                          {getStatusInfo(parent.status).text}
                         </span>
                         <span className="text-muted">
                           <FaStar
@@ -737,14 +744,13 @@ export default function FriscoDummy2({ location }) {
               style={{ maxWidth: "780px" }}
             >
               <SectionHeading className="mb-3">
-                Why Choose SignatureCare Emergency Center?
+                {parent.why_choose_title}
               </SectionHeading>
-              <p className="text-body fs-6 lh-lg mb-0">
-                We are nationally accredited, open 24 hours a day, and highly
-                rated by our patients. Our physicians are experienced, and we
-                are committed to providing an experience that reduces the stress
-                of visiting an emergency room.
-              </p>
+              {parent.why_choose_subtitle && (
+                <p className="text-body fs-6 lh-lg mb-0">
+                  {parent.why_choose_subtitle}
+                </p>
+              )}
             </div>
 
             <div className="row g-3">
@@ -781,19 +787,21 @@ export default function FriscoDummy2({ location }) {
           <div className="container">
             <div className="row g-5 align-items-center">
               <div className="col-lg-6 order-lg-2">
-                {location.slider_images?.[0]?.media?.path ? (
+                {parent.er_urgent_image ||
+                location.slider_images?.[0]?.media?.path ? (
                   <div
                     className="img-skeleton w-100 border rounded-4 overflow-hidden position-relative"
                     style={{ aspectRatio: "4/3" }}
                   >
                     <Image
                       src={
+                        parent.er_urgent_image ||
                         laravelURL +
-                        "/storage/" +
-                        location.slider_images[0].media.path
+                          "/storage/" +
+                          location.slider_images[0].media.path
                       }
                       alt={
-                        location.slider_images[0].media.alt_text ||
+                        location.slider_images?.[0]?.media?.alt_text ||
                         `Inside ${parent.city}`
                       }
                       fill
@@ -812,13 +820,13 @@ export default function FriscoDummy2({ location }) {
               </div>
               <div className="col-lg-6 order-lg-1">
                 <SectionHeading className="mb-3">
-                  Not sure whether you need an ER or urgent care?
+                  {parent.er_urgent_title}
                 </SectionHeading>
-                <p className="text-body fs-6 lh-lg mb-4">
-                  Come to SignatureCare Emergency Center in {parent.city} for
-                  symptoms or injuries that may need advanced testing, imaging,
-                  IV medications, or immediate physician evaluation.
-                </p>
+                {parent.er_urgent_subtitle && (
+                  <p className="text-body fs-6 lh-lg mb-4">
+                    {parent.er_urgent_subtitle}
+                  </p>
+                )}
 
                 <div className="mb-4">
                   <h3 className="fw-bold text-dark mb-2">
@@ -880,14 +888,14 @@ export default function FriscoDummy2({ location }) {
         <section className="sl-bg-cream py-5 border-top border-bottom">
           <div className="container">
             <div className="mb-4" style={{ maxWidth: "760px" }}>
-              <Eyebrow>When you arrive</Eyebrow>
               <SectionHeading className="mb-3">
-                From walk-in to discharge — here&rsquo;s what happens.
+                {parent.timeline_title}
               </SectionHeading>
-              <p className="text-muted mb-0 lh-base fs-6">
-                No long wait in a crowded waiting room. Average time from walk
-                in to discharge is under 90 minutes for most patients.
-              </p>
+              {parent.timeline_subtitle && (
+                <p className="text-muted mb-0 lh-base fs-6">
+                  {parent.timeline_subtitle}
+                </p>
+              )}
             </div>
 
             <div className="row g-0">
@@ -927,39 +935,19 @@ export default function FriscoDummy2({ location }) {
           </div>
         </section>
 
-        {/* ============ ABOUT (CONDITIONAL) ============ */}
-        {/* {(location.subheading || location.description) && (
-          <section className="sl-bg-cream py-5">
-            <div className="container">
-              <div className="row justify-content-center">
-                <div className="col-lg-9">
-                  <Eyebrow>About this location</Eyebrow>
-                  <SectionHeading className="mb-4">
-                    Inside SignatureCare {parent.city}
-                  </SectionHeading>
-                  {location.subheading && (
-                    <div className="ck-content text-body mb-3 fs-6"
-                         style={{ lineHeight: 1.65 }}
-                         dangerouslySetInnerHTML={{ __html: location.subheading }} />
-                  )}
-                  {location.description && (
-                    <div className="ck-content text-body fs-6"
-                         style={{ lineHeight: 1.7 }}>
-                      {parse(addLazyLoadWithSkeleton(location.description))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </section>
-        )} */}
-
         {/* ============ INSIDE GALLERY ============ */}
         {location.slider_images?.length > 0 && (
           <section className="bg-white py-5">
             <div className="container">
               <div className="mb-4">
-                <Eyebrow>Inside our {parent.city} ER</Eyebrow>
+                <SectionHeading className="mb-3">
+                  {parent.gallery_title}
+                </SectionHeading>
+                {parent.gallery_subtitle && (
+                  <p className="text-body lh-base mb-3 fs-6">
+                    {parent.gallery_subtitle}
+                  </p>
+                )}
                 <ul className="list-unstyled text-muted mb-0 lh-base small d-flex flex-wrap gap-3 mt-3">
                   {GALLERY_FEATURES.map((feature, i) => (
                     <li key={i} className="d-flex align-items-center gap-2">
@@ -1002,32 +990,23 @@ export default function FriscoDummy2({ location }) {
           <div className="container">
             <div className="card bg-white">
               <div className="card-body p-5">
-                <Eyebrow>Insurance &amp; billing</Eyebrow>
                 <SectionHeading className="mb-3">
-                  Insurance and Billing Questions?
+                  {parent.insurance_title}
                 </SectionHeading>
-                <p className="text-body mb-3 lh-lg fs-6">
-                  SignatureCare Emergency Center in {parent.city} is a licensed
-                  freestanding emergency room. ER billing is different from
-                  urgent care billing. If you have questions about insurance,
-                  benefits, or what to expect, please call our {parent.city}{" "}
-                  team, and we will help explain the process. We bill most
-                  national insurance plans, including Workers&rsquo;
-                  Compensation. Please call our facility at{" "}
-                  <a
-                    href={"tel:" + parent.tel}
-                    onClick={() => trackPhoneCall(parent.tel, parent.city)}
-                    className="text-danger fw-bold text-decoration-underline"
-                  >
-                    {parent.tel}
-                  </a>{" "}
-                  for information regarding your specific insurance coverage if
-                  you still have questions. We are open 24/7.
-                </p>
-                <p className="text-body fs-6 lh-lg mb-4">
-                  If you are experiencing a serious or life-threatening
-                  emergency, call 911 or go to the nearest emergency room.
-                </p>
+                {parent.insurance_subtitle && (
+                  <p className="text-body lh-base mb-3 fs-6">
+                    {parent.insurance_subtitle}
+                  </p>
+                )}
+                <div
+                  onClick={(e) => {
+                    const link = e.target.closest("a[href^='tel:']");
+                    if (link) trackPhoneCall(parent.tel, parent.city);
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: parent.insurance_body_html,
+                  }}
+                />
                 <div className="d-flex flex-wrap gap-2">
                   <a
                     href={"tel:" + parent.tel}
@@ -1053,35 +1032,16 @@ export default function FriscoDummy2({ location }) {
         <section className="bg-white py-5">
           <div className="container">
             <div className="text-center mb-4">
-              <SectionHeading>Frequently Asked Questions</SectionHeading>
+              <SectionHeading>{parent.faq_title}</SectionHeading>
+              {parent.faq_subtitle && (
+                <p className="text-body lh-base mt-3 mb-0 fs-6">
+                  {parent.faq_subtitle}
+                </p>
+              )}
             </div>
-            <FaqAccordion faqs={parent.faqs} />
+            <FaqAccordion faqs={faqs} />
           </div>
         </section>
-
-        {/* ============ SERVICE LINE PILLS ============ */}
-        {/* <section className="bg-white py-5 text-center">
-          <div className="container">
-            <Eyebrow>Coming soon</Eyebrow>
-            <h3 className="fs-4 fw-bold text-dark mb-4"
-                style={{ letterSpacing: "-0.01em" }}>
-              More {parent.city} ER services
-            </h3>
-            <div className="d-flex flex-wrap justify-content-center gap-2">
-              {[
-                "Pediatric ER", "Chest Pain", "Abdominal Pain",
-                "Stitches & Fractures", "CT Scan", "Dehydration / IV Fluids",
-              ].map((s) => (
-                <span
-                  key={s}
-                  className="sl-svc-pill sl-bg-cream text-body border d-inline-block rounded-pill fw-medium py-2 px-3"
-                >
-                  {s}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section> */}
 
         {/* ============ CLOSING CTA BAND ============ */}
         <section className="bg-dark text-white py-5 text-center">
@@ -1090,15 +1050,16 @@ export default function FriscoDummy2({ location }) {
               className="fw-bold text-white mb-3"
               style={{ lineHeight: 1.15, letterSpacing: "-0.02em" }}
             >
-              We&rsquo;re open. Walk in anytime.
+              {parent.closing_title}
             </h2>
-            <p
-              className="mx-auto mb-4 lh-base fs-6"
-              style={{ color: "#c8c2b5", maxWidth: "560px" }}
-            >
-              No appointment needed. Board-certified ER physicians available
-              24/7 at our {parent.city} Emergency Room.
-            </p>
+            {parent.closing_subtitle && (
+              <p
+                className="mx-auto mb-4 lh-base fs-6"
+                style={{ color: "#c8c2b5", maxWidth: "560px" }}
+              >
+                {parent.closing_subtitle}
+              </p>
+            )}
             <div className="d-flex flex-wrap justify-content-center gap-2">
               <a
                 href={"tel:" + parent.tel}
@@ -1120,7 +1081,7 @@ export default function FriscoDummy2({ location }) {
                 href={location.acuity_url || "/emergency-room-appointment"}
                 target={location.acuity_url ? "_blank" : undefined}
                 rel={location.acuity_url ? "noreferrer" : undefined}
-                onClick={() => trackBookAppointment("frisco-dummy-2")}
+                onClick={() => trackBookAppointment(parent.slug)}
                 className="sl-btn sl-btn-outline bg-transparent text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap border border-white rounded-3 py-3 px-4 lh-1 small"
               >
                 <FaCheckCircle size={14} /> Get online Appointment
@@ -1230,7 +1191,7 @@ export default function FriscoDummy2({ location }) {
           href={location.acuity_url || "/emergency-room-appointment"}
           target={location.acuity_url ? "_blank" : undefined}
           rel={location.acuity_url ? "noreferrer" : undefined}
-          onClick={() => trackBookAppointment("frisco-dummy-2")}
+          onClick={() => trackBookAppointment(parent.slug)}
           className="text-white d-flex flex-column align-items-center justify-content-center gap-1 text-decoration-none fw-bold rounded-3 small"
           style={{ height: "54px" }}
         >
@@ -1257,7 +1218,7 @@ export const getStaticProps = async () => {
       revalidate: 300,
     };
   } catch (err) {
-    console.error("frisco-dummy-2 fetch error:", err.message);
+    console.error("frisco sub-location fetch error:", err.message);
     return {
       props: {
         location: {},
