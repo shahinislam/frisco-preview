@@ -7,32 +7,10 @@ import {
   FaPhoneAlt,
   FaDirections,
   FaCheckCircle,
-  FaUserMd,
-  FaXRay,
-  FaChild,
-  FaBed,
-  FaClock,
-  FaShieldAlt,
   FaStar,
   FaRegStar,
   FaMapMarkerAlt,
   FaArrowRight,
-  FaAmbulance,
-  // Additional icons available for decision_tiles
-  FaStethoscope,
-  FaHeartbeat,
-  FaSyringe,
-  FaPills,
-  FaBriefcaseMedical,
-  FaUserNurse,
-  FaHospital,
-  FaFileMedical,
-  FaAward,
-  FaCertificate,
-  FaThumbsUp,
-  FaWheelchair,
-  FaCalendarCheck,
-  FaCreditCard,
 } from "react-icons/fa";
 import Accordion from "react-bootstrap/Accordion";
 
@@ -45,6 +23,7 @@ import {
   trackGetDirections,
   trackPhoneCall,
 } from "../components/utils/gtm";
+import { ICON_MAP, richTextParseOptions } from "../components/utils/rich-text";
 
 const LocationMap = dynamic(
   () => import("../components/templates/LocationMap"),
@@ -83,116 +62,6 @@ const cleanHTML = (htmlString) => {
     .trim();
 };
 
-// Mirrors CK_ICONS in the admin's CkEditorComponent. The admin's icon picker
-// stores <i class="fas fa-X" style="color:Y"> tags; we swap each for the
-// matching react-icons SVG since this project doesn't load Font Awesome.
-const CK_ICON_FA_MAP = {
-  "fa-shield-alt": FaShieldAlt,
-  "fa-user-md": FaUserMd,
-  "fa-x-ray": FaXRay,
-  "fa-bed": FaBed,
-  "fa-child": FaChild,
-  "fa-clock": FaClock,
-  "fa-phone-alt": FaPhoneAlt,
-  "fa-star": FaStar,
-  "fa-ambulance": FaAmbulance,
-  "fa-stethoscope": FaStethoscope,
-  "fa-heartbeat": FaHeartbeat,
-  "fa-syringe": FaSyringe,
-  "fa-pills": FaPills,
-  "fa-briefcase-medical": FaBriefcaseMedical,
-  "fa-user-nurse": FaUserNurse,
-  "fa-hospital": FaHospital,
-  "fa-file-medical": FaFileMedical,
-  "fa-award": FaAward,
-  "fa-certificate": FaCertificate,
-  "fa-check-circle": FaCheckCircle,
-  "fa-thumbs-up": FaThumbsUp,
-  "fa-wheelchair": FaWheelchair,
-  "fa-calendar-check": FaCalendarCheck,
-  "fa-credit-card": FaCreditCard,
-  "fa-map-marker-alt": FaMapMarkerAlt,
-};
-
-const richTextParseOptions = {
-  replace: (node) => {
-    if (!node.attribs || node.name !== "i") return;
-    const match = (node.attribs.class || "").match(/\bfa-[a-z0-9-]+\b/);
-    if (!match) return;
-    const Icon = CK_ICON_FA_MAP[match[0]];
-    if (!Icon) return;
-    const colorMatch = (node.attribs.style || "").match(/color:\s*([^;]+)/);
-    const color = colorMatch ? colorMatch[1].trim() : undefined;
-    return <Icon style={color ? { color } : undefined} />;
-  },
-};
-
-function getDefaultFaqs(profile) {
-  return [
-    {
-      question: "Are you open 24/7?",
-      answer: `Yes. SignatureCare Emergency Center ${profile.city} is open 24 hours a day, 365 days a year.`,
-    },
-    {
-      question: "Do I need an appointment?",
-      answer:
-        "No. Walk-ins are always welcome. If you prefer, you can book an appointment online but it is not necessary.",
-    },
-    {
-      question: "Are you an urgent care?",
-      answer: `No. SignatureCare Emergency Center ${profile.city} is a licensed freestanding emergency room with board-certified ER physicians, CT, X-ray, and onsite lab services.`,
-    },
-    {
-      question: "Do you treat children?",
-      answer:
-        "Yes. We treat all adults and children, including pediatric emergencies, such as high fever, dehydration, asthma, injuries, and severe abdominal pain, and more.",
-    },
-    {
-      question: "Do you have CT, X-ray, and lab testing?",
-      answer:
-        "Yes, we offer CT scan, X-ray, and laboratory services onsite 24/7.",
-    },
-    {
-      question: "Can I call before coming in?",
-      answer: `Yes, you can call our ${profile.city} emergency center at ${profile.tel} anytime, 24/7/365, with any questions you may have.`,
-    },
-    {
-      question: "When should I call 911?",
-      answer: "Call 911 for all life-threatening medical emergencies.",
-    },
-  ];
-}
-
-// Maps decision_tiles JSON `icon` string → React-icon component.
-// Admin form should restrict choices to these keys (25 curated icons).
-const ICON_MAP = {
-  FaShieldAlt,
-  FaUserMd,
-  FaXRay,
-  FaBed,
-  FaChild,
-  FaClock,
-  FaPhoneAlt,
-  FaStar,
-  FaAmbulance,
-  FaStethoscope,
-  FaHeartbeat,
-  FaSyringe,
-  FaPills,
-  FaBriefcaseMedical,
-  FaUserNurse,
-  FaHospital,
-  FaFileMedical,
-  FaAward,
-  FaCertificate,
-  FaCheckCircle,
-  FaThumbsUp,
-  FaWheelchair,
-  FaCalendarCheck,
-  FaCreditCard,
-  FaMapMarkerAlt,
-};
-
 // status: 0 = Closed, 1 = Open, 2 = Opening soon
 function getStatusInfo(status) {
   if (status === 0) return { text: "Closed", dot: "bg-secondary" };
@@ -201,9 +70,7 @@ function getStatusInfo(status) {
 }
 
 function SectionHeading({ children, className = "", as: Tag = "h2" }) {
-  if (children === null || children === undefined || children === "") {
-    return null;
-  }
+  if (!children) return null;
   return (
     <Tag
       className={`fw-bold ${className}`}
@@ -253,10 +120,7 @@ function FaqAccordion({ faqs }) {
 export default function LocationProfilePage({ location }) {
   const profile = location || {};
 
-  const faqs =
-    Array.isArray(profile.faqs) && profile.faqs.length > 0
-      ? profile.faqs
-      : getDefaultFaqs(profile);
+  const faqs = Array.isArray(profile.faqs) ? profile.faqs : [];
 
   const pageTitle =
     profile.seo_title ||
@@ -320,14 +184,18 @@ export default function LocationProfilePage({ location }) {
           ? profile.nearby_cities.split(",").map((c) => c.trim())
           : undefined,
       },
-      {
-        "@type": "FAQPage",
-        mainEntity: faqs.map((f) => ({
-          "@type": "Question",
-          name: f.question,
-          acceptedAnswer: { "@type": "Answer", text: f.answer },
-        })),
-      },
+      ...(faqs.length > 0
+        ? [
+            {
+              "@type": "FAQPage",
+              mainEntity: faqs.map((f) => ({
+                "@type": "Question",
+                name: f.question,
+                acceptedAnswer: { "@type": "Answer", text: f.answer },
+              })),
+            },
+          ]
+        : []),
     ],
   };
 
@@ -732,16 +600,16 @@ export default function LocationProfilePage({ location }) {
               {(profile.decision_tiles || []).map((tile, i) => {
                 const Icon = ICON_MAP[tile.icon];
                 return (
-                  <div key={i} className="col-6 col-md-4">
+                  <div key={i} className="col-12 col-sm-6 col-md-4">
                     <div className="sl-tile card h-100">
-                      <div className="card-body d-flex align-items-start gap-3">
+                      <div className="card-body d-flex align-items-center gap-3">
                         <div
                           className="sl-tile-icon bg-danger-subtle text-danger d-flex align-items-center justify-content-center flex-shrink-0 rounded-3"
                           style={{ width: "44px", height: "44px" }}
                         >
                           {Icon && <Icon size={20} />}
                         </div>
-                        <div className="fw-semibold text-dark pt-2 lh-sm fs-6">
+                        <div className="fw-semibold text-dark lh-sm fs-6">
                           {tile.label}
                         </div>
                       </div>
@@ -991,11 +859,11 @@ export default function LocationProfilePage({ location }) {
                 <div className="d-flex flex-wrap gap-2">
                   <a
                     href={"tel:" + profile.tel}
-                    className="sl-btn sl-btn-red bg-danger text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap rounded-3 py-2 px-3 lh-1 small"
+                    className="sl-btn sl-btn-red bg-danger text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none rounded-3 py-2 px-3 lh-base small text-start"
                     onClick={() => trackPhoneCall(profile.tel, profile.city)}
                   >
-                    <FaPhoneAlt size={13} /> Call our {profile.city} ER about
-                    insurance concerns
+                    <FaPhoneAlt size={13} className="flex-shrink-0" /> Call our{" "}
+                    {profile.city} ER about insurance concerns
                   </a>
                   <Link
                     href="/insurance-information"
@@ -1010,19 +878,24 @@ export default function LocationProfilePage({ location }) {
         </section>
 
         {/* ============ FAQ ============ */}
-        <section className="bg-white py-5">
-          <div className="container">
-            <div className="text-center mb-4">
-              <SectionHeading>{profile.faq_title}</SectionHeading>
-              {cleanHTML(profile.faq_subtitle) && (
-                <div className="ck-content text-body lh-base mt-3 mb-0 fs-6">
-                  {parse(cleanHTML(profile.faq_subtitle), richTextParseOptions)}
-                </div>
-              )}
+        {faqs.length > 0 && (
+          <section className="bg-white py-5">
+            <div className="container">
+              <div className="text-center mb-4">
+                <SectionHeading>{profile.faq_title}</SectionHeading>
+                {cleanHTML(profile.faq_subtitle) && (
+                  <div className="ck-content text-body lh-base mt-3 mb-0 fs-6">
+                    {parse(
+                      cleanHTML(profile.faq_subtitle),
+                      richTextParseOptions,
+                    )}
+                  </div>
+                )}
+              </div>
+              <FaqAccordion faqs={faqs} />
             </div>
-            <FaqAccordion faqs={faqs} />
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* ============ CLOSING CTA BAND ============ */}
         <section className="bg-dark text-white py-5 text-center">
