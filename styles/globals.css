@@ -12,13 +12,24 @@ body {
   }
 }
 
-/* Decrease all heading sizes */
-h1 { font-size: 28px !important; }
-h2 { font-size: 24px !important; }
-h3 { font-size: 20px !important; }
-h4 { font-size: 18px !important; }
-h5 { font-size: 16px !important; }
-h6 { font-size: 14px !important; }
+/* Decrease all heading sizes. Bootstrap size utilities (display-*, fs-*, small)
+   opt out so authors can explicitly resize a heading when needed. */
+h1:not([class*="display-"]):not([class*="fs-"]):not(.small) { font-size: 28px !important; }
+h2:not([class*="display-"]):not([class*="fs-"]):not(.small) { font-size: 24px !important; }
+h3:not([class*="display-"]):not([class*="fs-"]):not(.small) { font-size: 20px !important; }
+h4:not([class*="display-"]):not([class*="fs-"]):not(.small) { font-size: 18px !important; }
+h5:not([class*="display-"]):not([class*="fs-"]):not(.small) { font-size: 16px !important; }
+h6:not([class*="display-"]):not([class*="fs-"]):not(.small) { font-size: 14px !important; }
+
+/* Bootstrap's .display-6 ships at 1.5rem (24px) which is smaller than the h1
+   reset — force it bigger so a `.display-6` heading reads as a proper hero. */
+.display-6 { font-size: 2rem !important; }
+@media (min-width: 768px) {
+  .display-6 { font-size: 2.25rem !important; }
+}
+@media (min-width: 1200px) {
+  .display-6 { font-size: 2.5rem !important; }
+}
 
 img {
   max-width: 100%;

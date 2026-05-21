@@ -446,15 +446,6 @@ export default function FriscoDummy2({ location }) {
           <div className="container">
             <div className="row align-items-center g-5">
               <div className="col-lg-6">
-                <div className="d-inline-flex align-items-center gap-2 bg-white border rounded-pill fw-semibold text-body mb-3 py-1 px-3 small">
-                  <span
-                    className={`rounded-circle ${getStatusInfo(parent.status).dot}`}
-                    style={{ width: "7px", height: "7px" }}
-                  />
-                  {getStatusInfo(parent.status).text}
-                  {parent.is_24_7 && parent.status === 1 && " · 24/7/365"}
-                </div>
-
                 <h1 className="display-6 fw-bold text-dark mb-3">
                   {parent.hero_title}
                 </h1>
@@ -661,7 +652,7 @@ export default function FriscoDummy2({ location }) {
               </div>
 
               <div className="col-lg-6 d-flex flex-column">
-                <SectionHeading as="h3" className="mb-3 fs-6">
+                <SectionHeading className="mb-3">
                   {parent.map_title}
                 </SectionHeading>
                 {parent.map_subtitle && (
