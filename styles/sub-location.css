@@ -115,7 +115,67 @@
   .sl-gallery > .sl-gallery-cell:nth-child(1) { grid-row: 1; grid-column: 1 / span 2; }
 }
 
-/* Hero CTA row wrap on small screens */
+/* Hero CTA row — stack full-width on small screens so the three buttons
+   line up uniformly instead of wrapping 2-up + 1-up with different widths. */
 @media (max-width: 575px) {
-  .sl-hero-cta-row { flex-wrap: wrap !important; }
+  .sl-hero-cta-row {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+  }
+  .sl-hero-cta-row > * { width: 100%; }
+}
+
+/* Stacked CTA buttons with equal heights on mobile — used when one button's
+   label wraps to 2 lines and the other is single-line, which otherwise
+   produces a tall/short mismatch in the column. */
+@media (max-width: 575px) {
+  .sl-cta-equal-h {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    grid-auto-rows: 1fr;
+  }
+}
+
+/* Hero grid — title, image, rest are three named areas so the image can sit
+   between title and rest on mobile while still occupying the right column
+   across two rows on desktop. */
+.sl-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas: "title" "image" "rest";
+  row-gap: 1.5rem;
+}
+.sl-hero-grid > .sl-hero-title { grid-area: title; }
+.sl-hero-grid > .sl-hero-image { grid-area: image; }
+.sl-hero-grid > .sl-hero-rest { grid-area: rest; }
+@media (min-width: 992px) {
+  .sl-hero-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "title image"
+      "rest  image";
+    column-gap: 3rem;
+    row-gap: 1.5rem;
+    align-items: center;
+  }
+  .sl-hero-grid > .sl-hero-title { align-self: end; }
+  .sl-hero-grid > .sl-hero-rest { align-self: start; }
+}
+
+/* Map info card — floats over the map on md+, sits below it on mobile so
+   the address + rating + Directions button get full width instead of
+   being squeezed into a narrow absolute-positioned strip. */
+.sl-map-overlay {
+  position: static;
+  margin-top: 12px;
+}
+@media (min-width: 768px) {
+  .sl-map-overlay {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    right: 14px;
+    margin-top: 0;
+    z-index: 10;
+  }
 }

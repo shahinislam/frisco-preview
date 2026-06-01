@@ -123,6 +123,8 @@ a {
   color: hsl(0, 100%, 50%);
 }
 
+.ck-content.ck-content--inline p { margin-bottom: 0; }
+
 .btn-danger {
   background-color: hsl(0, 100%, 50%) !important;
 }
