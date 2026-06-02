@@ -1091,7 +1091,7 @@ function normalizeLocation(data) {
 export const getStaticProps = async () => {
   try {
     const [locationRes, layoutData] = await Promise.all([
-      http.get("/admin/location-profiles/preston").catch(() => ({ data: {} })),
+      http.get("/admin/location-profiles/college-station").catch(() => ({ data: {} })),
       getLayoutData(),
     ]);
 

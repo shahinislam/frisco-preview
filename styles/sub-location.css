@@ -162,6 +162,37 @@
   .sl-hero-grid > .sl-hero-rest { align-self: start; }
 }
 
+/* Founders section — hover effect on each block + photo zoom */
+.sl-founder > .row {
+  transition: background-color .25s ease, transform .25s ease;
+}
+.sl-founder:hover > .row {
+  background-color: var(--sl-cream);
+  transform: translateY(-2px);
+}
+.sl-founder-photo {
+  overflow: hidden;
+}
+.sl-founder-photo img {
+  transition: transform .6s ease;
+}
+.sl-founder:hover .sl-founder-photo img {
+  transform: scale(1.06);
+}
+
+/* Founders divider — single tapered gradient line */
+.sl-founder-divider {
+  align-self: stretch;
+  width: 1px;
+  margin: 2.5rem 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(204, 0, 0, 0.28) 50%,
+    transparent 100%
+  );
+}
+
 /* Map info card — floats over the map on md+, sits below it on mobile so
    the address + rating + Directions button get full width instead of
    being squeezed into a narrow absolute-positioned strip. */

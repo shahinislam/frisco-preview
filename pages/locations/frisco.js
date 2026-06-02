@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,30 +15,22 @@ import {
 } from "react-icons/fa";
 import Accordion from "react-bootstrap/Accordion";
 
-import http from "../components/utils/http";
-import laravelURL from "../components/utils/laravel-url";
-import mainURL from "../components/utils/main-url";
-import { getLayoutData } from "../components/utils/getLayoutData";
+import http from "../../components/utils/http";
+import laravelURL from "../../components/utils/laravel-url";
+import mainURL from "../../components/utils/main-url";
+import { getLayoutData } from "../../components/utils/getLayoutData";
 import {
   trackBookAppointment,
   trackGetDirections,
   trackPhoneCall,
-} from "../components/utils/gtm";
-import { ICON_MAP, richTextParseOptions } from "../components/utils/rich-text";
+} from "../../components/utils/gtm";
+import { ICON_MAP, richTextParseOptions } from "../../components/utils/rich-text";
 
 const LocationMap = dynamic(
-  () => import("../components/templates/LocationMap"),
+  () => import("../../components/templates/LocationMap"),
   {
     ssr: false,
-    loading: () => (
-      <div
-        style={{
-          height: "500px",
-          borderRadius: "16px",
-          background: "var(--sl-cream-deep)",
-        }}
-      />
-    ),
+    loading: () => <div style={{ height: "500px", borderRadius: "16px", background: "var(--sl-cream-deep)" }} />,
   },
 );
 
@@ -45,9 +38,7 @@ const SocialIcon = dynamic(
   () => import("react-social-icons").then((mod) => mod.SocialIcon),
   {
     ssr: false,
-    loading: () => (
-      <span style={{ width: 40, height: 40, display: "inline-block" }} />
-    ),
+    loading: () => <span style={{ width: 40, height: 40, display: "inline-block" }} />,
   },
 );
 
@@ -81,6 +72,7 @@ function SectionHeading({ children, className = "", as: Tag = "h2" }) {
     >
       {children}
     </Tag>
+    
   );
 }
 
@@ -240,7 +232,9 @@ export default function LocationProfilePage({ location }) {
       <div className="sl-bg-cream text-dark" style={{ paddingBottom: "90px" }}>
         {/* ============ OPEN-NOW BANNER ============ */}
         <div className="sl-banner-open bg-danger text-white position-relative overflow-hidden">
-          <div className="container position-relative d-flex flex-wrap align-items-center justify-content-center gap-3 py-2 text-center small">
+          <div
+            className="container position-relative d-flex flex-wrap align-items-center justify-content-center gap-3 py-2 text-center small"
+          >
             <span
               className="sl-pulse-dot rounded-circle bg-white flex-shrink-0"
               style={{ width: "8px", height: "8px" }}
@@ -248,25 +242,11 @@ export default function LocationProfilePage({ location }) {
             <span className="fw-bold small">
               {getStatusInfo(profile.status).text}
             </span>
-            <span
-              className="d-none d-md-inline-block"
-              style={{
-                width: "1px",
-                height: "12px",
-                background: "rgba(255,255,255,.4)",
-              }}
-            />
+            <span className="d-none d-md-inline-block" style={{ width: "1px", height: "12px", background: "rgba(255,255,255,.4)" }} />
             <span className="d-none d-md-inline fw-medium opacity-75">
               {profile.banner_message}
             </span>
-            <span
-              className="d-none d-md-inline-block"
-              style={{
-                width: "1px",
-                height: "12px",
-                background: "rgba(255,255,255,.4)",
-              }}
-            />
+            <span className="d-none d-md-inline-block" style={{ width: "1px", height: "12px", background: "rgba(255,255,255,.4)" }} />
             <a
               href={"tel:" + profile.tel}
               onClick={() => trackPhoneCall(profile.tel, profile.city)}
@@ -280,80 +260,99 @@ export default function LocationProfilePage({ location }) {
         {/* ============ HERO ============ */}
         <section className="bg-white py-5">
           <div className="container">
-            <div className="row align-items-center g-5">
-              <div className="col-lg-6">
-                <h1 className="display-6 fw-bold text-dark mb-3">
-                  {profile.hero_title}
-                </h1>
+            <div className="sl-hero-grid">
+              <h1 className="sl-hero-title display-6 fw-bold text-dark mb-0">
+                {profile.hero_title}
+              </h1>
 
+              <div className="sl-hero-image">
+                {profile.media ? (
+                  <div
+                    className="img-skeleton w-100 border rounded-4 overflow-hidden position-relative"
+                    style={{ aspectRatio: "5/4" }}
+                  >
+                    <Image
+                      src={laravelURL + "/storage/" + profile.media.path}
+                      alt={profile.media.alt_text || `${profile.city} Emergency Room`}
+                      fill
+                      sizes="(max-width: 992px) 100vw, 600px"
+                      className="object-fit-cover"
+                      quality={85}
+                      priority
+                      fetchpriority="high"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="w-100 sl-bg-cream-deep border rounded-4"
+                    style={{ aspectRatio: "5/4" }}
+                  />
+                )}
+              </div>
+
+              <div className="sl-hero-rest">
                 {cleanHTML(profile.hero_subtitle) && (
                   <div
                     className="ck-content text-body lh-base mb-4 fs-6"
                     style={{ maxWidth: "560px" }}
                   >
-                    {parse(
-                      cleanHTML(profile.hero_subtitle),
-                      richTextParseOptions,
-                    )}
+                    {parse(cleanHTML(profile.hero_subtitle), richTextParseOptions)}
                   </div>
                 )}
 
                 {/* meta card */}
                 <div className="sl-meta-card card shadow-sm overflow-hidden mb-4">
                   <div className="row g-0">
-                    <div className="sl-meta-cell col-12 col-md-5 p-3">
-                      <div
-                        className="fw-bold text-uppercase text-muted mb-1 small"
-                        style={{ letterSpacing: "0.1em" }}
-                      >
-                        Address
-                      </div>
-                      <div className="text-dark d-flex align-items-start gap-2 fw-bold lh-sm small">
-                        <FaMapMarkerAlt
-                          size={12}
-                          className="text-danger flex-shrink-0 mt-1"
-                        />
-                        <span>
-                          {profile.street}
-                          <span className="d-block fw-medium text-muted mt-1 small">
-                            {profile.city}, {profile.state} {profile.zip}
-                          </span>
-                        </span>
-                      </div>
+                  <div className="sl-meta-cell col-12 col-md-5 p-3">
+                    <div
+                      className="fw-bold text-uppercase text-muted mb-1 small"
+                      style={{ letterSpacing: "0.1em" }}
+                    >
+                      Address
                     </div>
-                    <div className="sl-meta-cell col-12 col-md p-3">
-                      <div
-                        className="fw-bold text-uppercase text-muted mb-1 small"
-                        style={{ letterSpacing: "0.1em" }}
-                      >
-                        Hours
-                      </div>
-                      <div className="fw-bold text-danger lh-sm small">
-                        Open 24/7/365
+                    <div
+                      className="text-dark d-flex align-items-start gap-2 fw-bold lh-sm small"
+                    >
+                      <FaMapMarkerAlt size={12} className="text-danger flex-shrink-0 mt-1" />
+                      <span>
+                        {profile.street}
                         <span className="d-block fw-medium text-muted mt-1 small">
-                          Walk-ins welcome
+                          {profile.city}, {profile.state} {profile.zip}
                         </span>
-                      </div>
-                    </div>
-                    <div className="sl-meta-cell col-12 col-md p-3">
-                      <div
-                        className="fw-bold text-uppercase text-muted mb-1 small"
-                        style={{ letterSpacing: "0.1em" }}
-                      >
-                        Rating
-                      </div>
-                      <div className="text-dark d-flex align-items-center gap-2 fw-bold lh-sm small">
-                        <span>{profile.google_rating}</span>
-                        <Stars
-                          rating={Math.round(profile.google_rating)}
-                          size={11}
-                        />
-                      </div>
-                      <span className="d-block fw-medium text-muted mt-1 small">
-                        {(profile.google_review_count || 0).toLocaleString()}+
-                        reviews
                       </span>
                     </div>
+                  </div>
+                  <div className="sl-meta-cell col-12 col-md p-3">
+                    <div
+                      className="fw-bold text-uppercase text-muted mb-1 small"
+                      style={{ letterSpacing: "0.1em" }}
+                    >
+                      Hours
+                    </div>
+                    <div className="fw-bold text-danger lh-sm small">
+                      Open 24/7/365
+                      <span className="d-block fw-medium text-muted mt-1 small">
+                        Walk-ins welcome
+                      </span>
+                    </div>
+                  </div>
+                  <div className="sl-meta-cell col-12 col-md p-3">
+                    <div
+                      className="fw-bold text-uppercase text-muted mb-1 small"
+                      style={{ letterSpacing: "0.1em" }}
+                    >
+                      Rating
+                    </div>
+                    <div
+                      className="text-dark d-flex align-items-center gap-2 fw-bold lh-sm small"
+                    >
+                      <span>{profile.google_rating}</span>
+                      <Stars rating={Math.round(profile.google_rating)} size={11} />
+                    </div>
+                    <span className="d-block fw-medium text-muted mt-1 small">
+                      {(profile.google_review_count || 0).toLocaleString()}+ reviews
+                    </span>
+                  </div>
                   </div>
                 </div>
 
@@ -386,34 +385,6 @@ export default function LocationProfilePage({ location }) {
                   </Link>
                 </div>
               </div>
-
-              <div className="col-lg-6">
-                {profile.media ? (
-                  <div
-                    className="img-skeleton w-100 border rounded-4 overflow-hidden position-relative"
-                    style={{ aspectRatio: "5/4" }}
-                  >
-                    <Image
-                      src={laravelURL + "/storage/" + profile.media.path}
-                      alt={
-                        profile.media.alt_text ||
-                        `${profile.city} Emergency Room`
-                      }
-                      fill
-                      sizes="(max-width: 992px) 100vw, 600px"
-                      className="object-fit-cover"
-                      quality={85}
-                      priority
-                      fetchpriority="high"
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className="w-100 sl-bg-cream-deep border rounded-4"
-                    style={{ aspectRatio: "5/4" }}
-                  />
-                )}
-              </div>
             </div>
           </div>
         </section>
@@ -421,12 +392,11 @@ export default function LocationProfilePage({ location }) {
         {/* ============ 911 DISCLAIMER ============ */}
         {cleanHTML(profile.disclaimer_html) && (
           <section className="sl-bg-cream text-dark">
-            <div className="container d-flex flex-wrap align-items-center justify-content-center gap-3 py-2 text-center lh-base small">
+            <div
+              className="container d-flex flex-wrap align-items-center justify-content-center gap-3 py-2 text-center lh-base small"
+            >
               <div className="ck-content ck-content--inline fw-medium">
-                {parse(
-                  cleanHTML(profile.disclaimer_html),
-                  richTextParseOptions,
-                )}
+                {parse(cleanHTML(profile.disclaimer_html), richTextParseOptions)}
               </div>
             </div>
           </section>
@@ -442,10 +412,7 @@ export default function LocationProfilePage({ location }) {
                 </SectionHeading>
                 {cleanHTML(profile.reviews_subtitle) && (
                   <div className="ck-content text-body lh-base mb-3 fs-6">
-                    {parse(
-                      cleanHTML(profile.reviews_subtitle),
-                      richTextParseOptions,
-                    )}
+                    {parse(cleanHTML(profile.reviews_subtitle), richTextParseOptions)}
                   </div>
                 )}
                 <div className="d-flex align-items-center gap-3 mb-4 p-3 sl-bg-cream rounded-4">
@@ -453,13 +420,9 @@ export default function LocationProfilePage({ location }) {
                     {profile.google_rating}
                   </div>
                   <div>
-                    <Stars
-                      rating={Math.round(profile.google_rating)}
-                      size={16}
-                    />
+                    <Stars rating={Math.round(profile.google_rating)} size={16} />
                     <div className="text-muted small mt-1">
-                      {(profile.google_review_count || 0).toLocaleString()}+
-                      Google reviews
+                      {(profile.google_review_count || 0).toLocaleString()}+ Google reviews
                     </div>
                   </div>
                 </div>
@@ -474,8 +437,12 @@ export default function LocationProfilePage({ location }) {
                         <div className="mb-1">
                           <Stars rating={r.rating} size={11} />
                         </div>
-                        <p className="text-body fst-italic mb-2 lh-sm small position-relative ps-3">
-                          <span className="position-absolute top-0 start-0 text-danger lh-1 fs-3 fw-bold">
+                        <p
+                          className="text-body fst-italic mb-2 lh-sm small position-relative ps-3"
+                        >
+                          <span
+                            className="position-absolute top-0 start-0 text-danger lh-1 fs-3 fw-bold"
+                          >
                             &ldquo;
                           </span>
                           {r.body}
@@ -504,30 +471,25 @@ export default function LocationProfilePage({ location }) {
                 <SectionHeading className="mb-3">
                   {profile.map_title}
                 </SectionHeading>
-                <div className="text-dark mb-3">{profile.address}</div>
+                <div className="text-dark mb-3">
+                  {profile.address}
+                </div>
 
-                <div className="position-relative border rounded-4 overflow-hidden shadow-sm">
-                  <LocationMap
-                    height="500px"
-                    location={{
-                      name: `SignatureCare ER - ${profile.city}`,
-                      address: profile.address,
-                      latitude: profile.latitude || "33.1085",
-                      longitude: profile.longitude || "-96.8033",
-                    }}
-                  />
-                  <div
-                    className="position-absolute bg-white d-flex align-items-center gap-3 p-3 rounded-4 shadow"
-                    style={{
-                      zIndex: 10,
-                      bottom: "14px",
-                      left: "14px",
-                      right: "14px",
-                    }}
-                  >
+                <div className="position-relative">
+                  <div className="border rounded-4 overflow-hidden shadow-sm">
+                    <LocationMap
+                      height="500px"
+                      location={{
+                        name: `SignatureCare ER - ${profile.city}`,
+                        address: profile.address,
+                        latitude: profile.latitude || "33.1085",
+                        longitude: profile.longitude || "-96.8033",
+                      }}
+                    />
+                  </div>
+                  <div className="sl-map-overlay bg-white d-flex flex-wrap align-items-center column-gap-3 row-gap-2 p-3 rounded-4 shadow">
                     <div
-                      className="d-flex align-items-center justify-content-center flex-shrink-0 bg-danger text-white rounded-3"
-                      style={{ width: "44px", height: "44px" }}
+                      className="d-flex align-items-center justify-content-center flex-shrink-0 bg-danger text-white rounded-3" style={{ width: "44px", height: "44px" }}
                     >
                       <FaMapMarkerAlt size={20} />
                     </div>
@@ -538,8 +500,10 @@ export default function LocationProfilePage({ location }) {
                       <div className="text-muted mt-1 small">
                         {profile.address}
                       </div>
-                      <div className="d-flex align-items-center gap-3 mt-1 small">
-                        <span className="d-inline-flex align-items-center fw-semibold gap-1">
+                      <div className="d-flex flex-wrap align-items-center column-gap-3 row-gap-1 mt-1 small">
+                        <span
+                          className="d-inline-flex align-items-center fw-semibold gap-1"
+                        >
                           <span
                             className={`rounded-circle ${getStatusInfo(profile.status).dot}`}
                             style={{ width: "6px", height: "6px" }}
@@ -547,16 +511,9 @@ export default function LocationProfilePage({ location }) {
                           {getStatusInfo(profile.status).text}
                         </span>
                         <span className="text-muted">
-                          <FaStar
-                            size={11}
-                            className="text-warning me-1"
-                            style={{ marginTop: "-2px" }}
-                          />
-                          <strong className="text-dark">
-                            {profile.google_rating}
-                          </strong>{" "}
-                          ({(profile.google_review_count || 0).toLocaleString()}
-                          +)
+                          <FaStar size={11} className="text-warning me-1" style={{ marginTop: "-2px" }} />
+                          <strong className="text-dark">{profile.google_rating}</strong>{" "}
+                          ({(profile.google_review_count || 0).toLocaleString()}+)
                         </span>
                       </div>
                     </div>
@@ -565,7 +522,7 @@ export default function LocationProfilePage({ location }) {
                       target="_blank"
                       rel="noreferrer"
                       onClick={() => trackGetDirections(profile.city)}
-                      className="sl-btn sl-btn-dark bg-dark text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap rounded-pill py-2 px-3 flex-shrink-0 lh-1 small"
+                      className="sl-btn sl-btn-dark bg-dark text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap rounded-pill py-2 px-3 flex-shrink-0 lh-1 small ms-auto"
                     >
                       <FaArrowRight size={11} /> Directions
                     </a>
@@ -576,22 +533,97 @@ export default function LocationProfilePage({ location }) {
           </div>
         </section>
 
+        {/* ============ FOUNDERS ============ */}
+        {profile.founders?.length > 0 && (
+          <section className="bg-white py-5 border-top">
+            <div className="container">
+              <div className="text-center mx-auto mb-5" style={{ maxWidth: "640px" }}>
+                {profile.founders_title && (
+                  <SectionHeading className="mb-3">
+                    {profile.founders_title}
+                  </SectionHeading>
+                )}
+                {cleanHTML(profile.founders_subtitle) && (
+                  <div className="ck-content text-body lh-base mb-0 fs-6">
+                    {parse(cleanHTML(profile.founders_subtitle), richTextParseOptions)}
+                  </div>
+                )}
+              </div>
+
+              <div className="row g-4 align-items-stretch justify-content-center">
+                {profile.founders.map((doc, i, arr) => (
+                  <Fragment key={i}>
+                    <div className="sl-founder col-12 col-md-6 col-lg d-flex">
+                      <div className="row g-3 w-100 align-items-stretch p-2 rounded-4">
+                        {doc.photo && (
+                          <div className="col-5">
+                            <div
+                              className="sl-founder-photo position-relative"
+                              style={{ aspectRatio: "4 / 5", borderRadius: "24px" }}
+                            >
+                              <div
+                                className="position-absolute"
+                                style={{ top: "-1px", left: 0, right: 0, bottom: 0 }}
+                              >
+                                <Image
+                                  src={doc.photo}
+                                  alt={doc.name || "Founder"}
+                                  fill
+                                  sizes="(max-width: 768px) 33vw, 180px"
+                                  className="object-fit-cover"
+                                  style={{ objectPosition: "top" }}
+                                  quality={80}
+                                  loading="lazy"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        <div
+                          className={`${doc.photo ? "col-7" : "col-12"} d-flex flex-column`}
+                        >
+                          {doc.quote && (
+                            <p className="fst-italic text-body lh-sm mb-3 small">
+                              &ldquo;{doc.quote}&rdquo;
+                            </p>
+                          )}
+                          {doc.name && (
+                            <div className="d-flex align-items-center gap-2 mt-auto">
+                              <span
+                                className="d-inline-block bg-danger rounded-pill flex-shrink-0"
+                                style={{ width: "20px", height: "2px" }}
+                              />
+                              <span className="fw-bold text-dark small text-nowrap">
+                                {doc.name}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {i < arr.length - 1 && (
+                      <div className="col-lg-auto d-none d-lg-flex align-items-stretch">
+                        <div className="sl-founder-divider" />
+                      </div>
+                    )}
+                  </Fragment>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* ============ WHY CHOOSE / TILES ============ */}
         <section className="sl-bg-cream py-5">
           <div className="container">
-            <div
-              className="text-center mx-auto mb-5"
-              style={{ maxWidth: "780px" }}
-            >
+            <div className="text-center mx-auto mb-5" style={{ maxWidth: "780px" }}>
               <SectionHeading className="mb-3">
                 {profile.why_choose_title}
               </SectionHeading>
               {cleanHTML(profile.why_choose_subtitle) && (
                 <div className="ck-content text-body fs-6 lh-lg mb-0">
-                  {parse(
-                    cleanHTML(profile.why_choose_subtitle),
-                    richTextParseOptions,
-                  )}
+                  {parse(cleanHTML(profile.why_choose_subtitle), richTextParseOptions)}
                 </div>
               )}
             </div>
@@ -604,8 +636,7 @@ export default function LocationProfilePage({ location }) {
                     <div className="sl-tile card h-100">
                       <div className="card-body d-flex align-items-center gap-3">
                         <div
-                          className="sl-tile-icon bg-danger-subtle text-danger d-flex align-items-center justify-content-center flex-shrink-0 rounded-3"
-                          style={{ width: "44px", height: "44px" }}
+                          className="sl-tile-icon bg-danger-subtle text-danger d-flex align-items-center justify-content-center flex-shrink-0 rounded-3" style={{ width: "44px", height: "44px" }}
                         >
                           {Icon && <Icon size={20} />}
                         </div>
@@ -626,8 +657,8 @@ export default function LocationProfilePage({ location }) {
           <div className="container">
             <div className="row g-5 align-items-center">
               <div className="col-lg-6 order-lg-2">
-                {profile.er_urgent_media?.path ||
-                profile.slider_images?.[0]?.media?.path ? (
+                {(profile.er_urgent_media?.path ||
+                  profile.slider_images?.[0]?.media?.path) ? (
                   <div
                     className="img-skeleton w-100 border rounded-4 overflow-hidden position-relative"
                     style={{ aspectRatio: "4/3" }}
@@ -664,10 +695,7 @@ export default function LocationProfilePage({ location }) {
                 </SectionHeading>
                 {cleanHTML(profile.er_urgent_subtitle) && (
                   <div className="ck-content text-body fs-6 lh-lg mb-4">
-                    {parse(
-                      cleanHTML(profile.er_urgent_subtitle),
-                      richTextParseOptions,
-                    )}
+                    {parse(cleanHTML(profile.er_urgent_subtitle), richTextParseOptions)}
                   </div>
                 )}
 
@@ -681,10 +709,7 @@ export default function LocationProfilePage({ location }) {
                         key={i}
                         className="col-12 col-sm-6 d-flex align-items-start gap-2 text-body lh-sm small"
                       >
-                        <FaCheckCircle
-                          size={13}
-                          className="text-danger flex-shrink-0 mt-1"
-                        />
+                        <FaCheckCircle size={13} className="text-danger flex-shrink-0 mt-1" />
                         <span>{c}</span>
                       </div>
                     ))}
@@ -701,15 +726,13 @@ export default function LocationProfilePage({ location }) {
                         key={i}
                         className="col-12 col-sm-6 d-flex align-items-start gap-2 text-body lh-sm small"
                       >
-                        <FaCheckCircle
-                          size={13}
-                          className="text-muted flex-shrink-0 mt-1"
-                        />
+                        <FaCheckCircle size={13} className="text-muted flex-shrink-0 mt-1" />
                         <span>{c}</span>
                       </div>
                     ))}
                   </div>
                 </div>
+
               </div>
             </div>
 
@@ -736,10 +759,7 @@ export default function LocationProfilePage({ location }) {
               </SectionHeading>
               {cleanHTML(profile.timeline_subtitle) && (
                 <div className="ck-content text-muted mb-0 lh-base fs-6">
-                  {parse(
-                    cleanHTML(profile.timeline_subtitle),
-                    richTextParseOptions,
-                  )}
+                  {parse(cleanHTML(profile.timeline_subtitle), richTextParseOptions)}
                 </div>
               )}
             </div>
@@ -786,24 +806,16 @@ export default function LocationProfilePage({ location }) {
           <section className="bg-white py-5">
             <div className="container">
               <div className="mb-4">
-                <SectionHeading className="mb-3">
-                  {profile.gallery_title}
-                </SectionHeading>
+                <SectionHeading className="mb-3">{profile.gallery_title}</SectionHeading>
                 {cleanHTML(profile.gallery_subtitle) && (
                   <div className="ck-content text-body lh-base mb-3 fs-6">
-                    {parse(
-                      cleanHTML(profile.gallery_subtitle),
-                      richTextParseOptions,
-                    )}
+                    {parse(cleanHTML(profile.gallery_subtitle), richTextParseOptions)}
                   </div>
                 )}
                 <ul className="list-unstyled text-muted mb-0 lh-base small d-flex flex-wrap gap-3 mt-3">
                   {(profile.gallery_features || []).map((feature, i) => (
                     <li key={i} className="d-flex align-items-center gap-2">
-                      <FaCheckCircle
-                        size={13}
-                        className="text-danger flex-shrink-0"
-                      />
+                      <FaCheckCircle size={13} className="text-danger flex-shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -819,9 +831,7 @@ export default function LocationProfilePage({ location }) {
                     <Image
                       fill
                       src={laravelURL + "/storage/" + item.media?.path}
-                      alt={
-                        item.media?.alt_text || `${profile.city} Emergency Room`
-                      }
+                      alt={item.media?.alt_text || `${profile.city} Emergency Room`}
                       sizes="(max-width: 768px) 100vw, (max-width: 992px) 50vw, 33vw"
                       className="object-fit-cover"
                       quality={75}
@@ -838,43 +848,39 @@ export default function LocationProfilePage({ location }) {
         <section className="sl-bg-cream py-5">
           <div className="container">
             <div className="card bg-white">
-              <div className="card-body p-5">
-                <SectionHeading className="mb-3">
-                  {profile.insurance_title}
-                </SectionHeading>
-                {cleanHTML(profile.insurance_body_html) && (
-                  <div
-                    className="ck-content"
-                    onClick={(e) => {
-                      const link = e.target.closest("a[href^='tel:']");
-                      if (link) trackPhoneCall(profile.tel, profile.city);
-                    }}
-                  >
-                    {parse(
-                      cleanHTML(profile.insurance_body_html),
-                      richTextParseOptions,
+              <div className="card-body p-3 p-md-5">
+                    <SectionHeading className="mb-3">
+                      {profile.insurance_title}
+                    </SectionHeading>
+                    {cleanHTML(profile.insurance_body_html) && (
+                      <div
+                        className="ck-content"
+                        onClick={(e) => {
+                          const link = e.target.closest("a[href^='tel:']");
+                          if (link) trackPhoneCall(profile.tel, profile.city);
+                        }}
+                      >
+                        {parse(cleanHTML(profile.insurance_body_html), richTextParseOptions)}
+                      </div>
                     )}
+                    <div className="sl-cta-equal-h d-flex flex-column flex-sm-row flex-sm-wrap gap-2">
+                      <a
+                        href={"tel:" + profile.tel}
+                        className="sl-btn sl-btn-red bg-danger text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none rounded-3 py-2 px-3 lh-base small text-center"
+                        onClick={() => trackPhoneCall(profile.tel, profile.city)}
+                      >
+                        <FaPhoneAlt size={13} className="flex-shrink-0" /> Call our {profile.city} ER about insurance concerns
+                      </a>
+                      <Link
+                        href="/insurance-information"
+                        className="sl-btn sl-btn-outline bg-white text-dark d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap border border-dark rounded-3 py-2 px-3 lh-1 small"
+                      >
+                        Read facility notice <FaArrowRight size={11} />
+                      </Link>
+                    </div>
                   </div>
-                )}
-                <div className="d-flex flex-wrap gap-2">
-                  <a
-                    href={"tel:" + profile.tel}
-                    className="sl-btn sl-btn-red bg-danger text-white d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none rounded-3 py-2 px-3 lh-base small text-start"
-                    onClick={() => trackPhoneCall(profile.tel, profile.city)}
-                  >
-                    <FaPhoneAlt size={13} className="flex-shrink-0" /> Call our{" "}
-                    {profile.city} ER about insurance concerns
-                  </a>
-                  <Link
-                    href="/insurance-information"
-                    className="sl-btn sl-btn-outline bg-white text-dark d-inline-flex align-items-center justify-content-center gap-2 fw-semibold text-decoration-none text-nowrap border border-dark rounded-3 py-2 px-3 lh-1 small"
-                  >
-                    Read facility notice <FaArrowRight size={11} />
-                  </Link>
                 </div>
               </div>
-            </div>
-          </div>
         </section>
 
         {/* ============ FAQ ============ */}
@@ -885,10 +891,7 @@ export default function LocationProfilePage({ location }) {
                 <SectionHeading>{profile.faq_title}</SectionHeading>
                 {cleanHTML(profile.faq_subtitle) && (
                   <div className="ck-content text-body lh-base mt-3 mb-0 fs-6">
-                    {parse(
-                      cleanHTML(profile.faq_subtitle),
-                      richTextParseOptions,
-                    )}
+                    {parse(cleanHTML(profile.faq_subtitle), richTextParseOptions)}
                   </div>
                 )}
               </div>
@@ -911,10 +914,7 @@ export default function LocationProfilePage({ location }) {
                 className="ck-content mx-auto mb-4 lh-base fs-6"
                 style={{ color: "#c8c2b5", maxWidth: "560px" }}
               >
-                {parse(
-                  cleanHTML(profile.closing_subtitle),
-                  richTextParseOptions,
-                )}
+                {parse(cleanHTML(profile.closing_subtitle), richTextParseOptions)}
               </div>
             )}
             <div className="d-flex flex-wrap justify-content-center gap-2">
@@ -1070,6 +1070,7 @@ const JSON_ARRAY_FIELDS = [
   "urgent_care_conditions",
   "gallery_features",
   "reviews",
+  "founders",
 ];
 
 function normalizeLocation(data) {
